@@ -6,7 +6,8 @@ import '../../theme/theme_provider.dart';
 import '../transaction/topup_screen.dart';
 import '../transaction/beli_screen.dart';
 import '../transaction/jual_screen.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../controllers/auth_controller.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
