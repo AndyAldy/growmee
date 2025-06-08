@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growmee/screens/auth/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

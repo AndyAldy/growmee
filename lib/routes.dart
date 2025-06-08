@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/reksadana/reksadana_screen.dart';
 import 'screens/portfolio/portfolio_screen.dart';
 import 'screens/portfolio/portfolio_reksadana.dart';
 import 'screens/portfolio/portfolio_sekuritas.dart';
@@ -13,17 +12,17 @@ import 'screens/history/history_pembelian.dart';
 import 'screens/history/history_jual.dart';
 import 'screens/history/history_pengalihan.dart';
 
-final Map<String, WidgetBuilder> appRoutes = {
-  '/': (context) => const LoginScreen(),
-  '/register': (context) => const RegisterScreen(),
-  '/home': (context) => const HomeScreen(),
-  '/portfolio': (context) => const PortfolioScreen(userId: '',),
-  '/portfolio/reksadana': (context) => PortfolioReksadanaScreen(userId: '',),
-  '/portfolio/sekuritas': (context) => PortfolioSekuritasScreen(userId: '',),
-  '/reksadana': (context) => const ReksadanaScreen(),
-  '/profile': (context) => const ProfileScreen(),
-  '/profile/risk': (context) => const ProfileRiskScreen(),
-  '/history/pembelian': (context) => HistoryPembelianScreen(),
-  '/history/jual': (context) => const HistoryJualScreen(),
-  '/history/pengalihan': (context) => HistoryPengalihanScreen(),
-};
+final List<GetPage> appPages = [
+  GetPage(name: '/', page: () => const LoginScreen()),
+  GetPage(name: '/register', page: () => const RegisterScreen()),
+  GetPage(name: '/home', page: () => const HomeScreen()),
+  GetPage(name: '/portfolio', page: () => PortfolioScreen(userId: '')),
+  GetPage(name: '/portfolio/reksadana', page: () => PortfolioReksadanaScreen(userId: '')),
+  GetPage(name: '/portfolio/sekuritas', page: () => PortfolioSekuritasScreen(userId: '')),
+  GetPage(name: '/reksadana', page: () => const ReksadanaScreen()),
+  GetPage(name: '/profile', page: () => const ProfileScreen()),
+  GetPage(name: '/profile/risk', page: () => const ProfileRiskScreen()),
+  GetPage(name: '/history/pembelian', page: () => HistoryPembelianScreen()),
+  GetPage(name: '/history/jual', page: () => const HistoryJualScreen()),
+  GetPage(name: '/history/pengalihan', page: () => HistoryPengalihanScreen()),
+];

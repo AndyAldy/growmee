@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:growmee/screens/auth/login_screen.dart';
 import 'package:growmee/theme/theme_provider.dart';
+import 'routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,9 @@ class GrowME extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: const LoginScreen(),
+      initialRoute: '/',
+      getPages: appPages,
     );
   }
 }
+
