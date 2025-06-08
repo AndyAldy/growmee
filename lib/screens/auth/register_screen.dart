@@ -37,7 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      Get.offAllNamed('/home'); // Navigasi langsung ke halaman utama setelah daftar
+      Get.offAllNamed('/login'); // Navigasi langsung ke halaman utama setelah daftar
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message ?? 'Terjadi kesalahan';

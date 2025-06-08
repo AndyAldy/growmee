@@ -10,8 +10,6 @@ class UserController with ChangeNotifier {
   UserModel? _userModel;
   UserModel? get userModel => _userModel;
 
-  get userData => null;
-
   /// Fetch data user dari Firestore dan simpan ke model
   Future<void> fetchUserData() async {
     try {

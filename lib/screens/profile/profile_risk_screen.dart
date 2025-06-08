@@ -18,7 +18,7 @@ class _ProfileRiskScreenState extends State<ProfileRiskScreen> {
   void initState() {
     super.initState();
     final userController = Provider.of<UserController>(context, listen: false);
-    _selectedRisk = userController.userData?['riskLevel'];
+    _selectedRisk = userController.userModel?.riskLevel;
   }
 
   @override
