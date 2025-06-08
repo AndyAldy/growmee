@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../controllers/user_controller.dart';
 import 'profile_risk_screen.dart';
 import 'package:provider/provider.dart';
-import '../../models/user_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/user_controller.dart';
-import '../../models/user_model.dart';
 
 class ProfileRiskScreen extends StatefulWidget {
   const ProfileRiskScreen({super.key});

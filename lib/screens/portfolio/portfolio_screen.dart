@@ -17,7 +17,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages = [
+    final List<Widget> pages = [
       PortfolioReksadanaScreen(userId: widget.userId),
       PortfolioSekuritasScreen(userId: widget.userId),
     ];
@@ -29,7 +29,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     onPressed: () => Get.back(),
   ),
       ),
-      body: _pages[_selectedIndex],
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         items: const [
