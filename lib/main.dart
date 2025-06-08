@@ -5,16 +5,23 @@ import 'package:get/get.dart';
 import 'package:growmee/theme/theme_provider.dart';
 import 'routes.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  // Inisialisasi Firebase sesuai dengan platform (Android/iOS/Web)
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserController()..fetchUserData()),
-        // Jika AuthController juga pakai ChangeNotifier, bisa ditambahkan:
-        // ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(
+          create: (_) => UserController()..fetchUserData(),
+        ),
+        // Tambahkan AuthController jika diperlukan
       ],
       child: const GrowME(),
     ),
@@ -37,4 +44,3 @@ class GrowME extends StatelessWidget {
     );
   }
 }
-
