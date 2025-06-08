@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.growME"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -40,8 +40,7 @@ android {
 
   // Add the dependencies for any other desired Firebase products
   // https://firebase.google.com/docs/android/setup#available-libraries
-}
-
+    }
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
