@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1062899694013",
+    "project_id": "growme-91008",
+    "storage_bucket": "growme-91008.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1062899694013:android:94945b1c4297669f35bad4",
+        "android_client_info": {
+          "package_name": "com.growME"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqWDP4GHJPtubGWFuNZ-B-9kNFPKjUqT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
