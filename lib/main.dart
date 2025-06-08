@@ -1,36 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'routes.dart';
-import 'constants/colors.dart';
-import 'theme/theme_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
+import 'routes/app_pages.dart';
+import 'screens/splash_screen.dart';
 
-void main() {
-  runApp(const GrowMEApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
-class GrowMEApp extends StatelessWidget {
-  const GrowMEApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            title: 'GrowME',
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              scaffoldBackgroundColor: skyBlue,
-              brightness: Brightness.light,
-            ),
-            darkTheme: ThemeData.dark(),
-            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            initialRoute: '/',
-            routes: appRoutes,
-          );
-        },
+    return GetMaterialApp(
+      title: 'GrowMee',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: SplashScreen(),
+      getPages: AppPages.routes,
     );
   }
 }
