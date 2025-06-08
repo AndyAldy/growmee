@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Text('Nama: ${user.name ?? '-'}', style: const TextStyle(fontSize: 18)),
                   const SizedBox(height: 12),
-                  Text('Email: ${user.email ?? '-'}', style: const TextStyle(fontSize: 16)),
+                  Text('Email: ${user.email}', style: const TextStyle(fontSize: 16)),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {

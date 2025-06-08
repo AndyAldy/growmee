@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/reksadana_card.dart';
 import '../../theme/theme_provider.dart';
+import '../transaction/topup_screen.dart';
+import '../transaction/beli_screen.dart';
+import '../transaction/jual_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -72,9 +76,24 @@ class HomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _QuickAction(icon: Icons.add_circle, label: 'Top Up', isDark: isDark),
-              _QuickAction(icon: Icons.shopping_cart, label: 'Beli', isDark: isDark),
-              _QuickAction(icon: Icons.trending_down, label: 'Jual', isDark: isDark),
+              _QuickAction(
+                icon: Icons.add_circle,
+                label: 'Top Up',
+                isDark: isDark,
+                onTap: () => Get.to(() => const TopUpScreen()),
+              ),
+              _QuickAction(
+                icon: Icons.shopping_cart,
+                label: 'Beli',
+                isDark: isDark,
+                onTap: () => Get.to(() => const BeliScreen()),
+              ),
+              _QuickAction(
+                icon: Icons.trending_down,
+                label: 'Jual',
+                isDark: isDark,
+                onTap: () => Get.to(() => const JualScreen()),
+              ),
             ],
           ),
           const SizedBox(height: 28),
@@ -120,24 +139,33 @@ class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isDark;
+  final VoidCallback onTap;
 
-  const _QuickAction({required this.icon, required this.label, required this.isDark});
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.isDark,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 26,
-          backgroundColor: isDark ? Colors.grey[700] : Colors.white,
-          child: Icon(icon, color: Colors.blueAccent, size: 30),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
-        ),
-      ],
+    return GestureDetector(
+      onTap: onTap, // ⬅️ Navigasi saat dipencet
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: isDark ? Colors.grey[700] : Colors.white,
+            child: Icon(icon, color: Colors.blueAccent, size: 30),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+          ),
+        ],
+      ),
     );
   }
 }
