@@ -1,12 +1,38 @@
 import 'package:flutter/material.dart';
 
-class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode = false;
+class AppTheme {
+  static final ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: const Color(0xFF87CEEB), // Sky Blue
+    primarySwatch: Colors.blue,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF87CEEB), // Sky Blue
+      elevation: 0,
+      foregroundColor: Colors.black,
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF87CEEB),
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black54,
+    ),
+  );
 
-  bool get isDarkMode => _isDarkMode;
+  static final ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: Colors.grey[900],
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      elevation: 0,
+      foregroundColor: Colors.white,
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.black,
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.grey,
+    ),
+  );
 
-  void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
-  }
+  var isDarkMode;
+
+  AppTheme(BuildContext context);
 }

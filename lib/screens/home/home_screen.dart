@@ -1,22 +1,132 @@
 import 'package:flutter/material.dart';
+import '../../widgets/nav_bar.dart';
+import '../../widgets/reksadana_card.dart';
+import '../../theme/theme_provider.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = AppTheme(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-            appBar: AppBar(
-              title: const Text("Dashboard"),
-              actions: const [],
+      backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Investasi',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        automaticallyImplyLeading: false,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(
+            'Halo, Investor 👋',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : Colors.black87,
             ),
-            body: SingleChildScrollView(
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                child: const Column(
-                  children: [],
+          ),
+          const SizedBox(height: 12),
+          // Total Investasi Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(color: Colors.black12, blurRadius: 4),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Investasi Anda',
+                  style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.black),
                 ),
-              ),
+                const SizedBox(height: 10),
+                Text(
+                  'Rp 12.500.000',
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+                ),
+              ],
             ),
+          ),
+          const SizedBox(height: 20),
+          // Aksi cepat
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _QuickAction(icon: Icons.add_circle, label: 'Top Up', isDark: isDark),
+              _QuickAction(icon: Icons.shopping_cart, label: 'Beli', isDark: isDark),
+              _QuickAction(icon: Icons.trending_down, label: 'Jual', isDark: isDark),
+            ],
+          ),
+          const SizedBox(height: 28),
+          Text(
+            'Rekomendasi Reksadana',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+          ),
+          const SizedBox(height: 12),
+          // Card Horizontal
+          SizedBox(
+            height: 160,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: const [
+                ReksadanaCard(
+                  title: 'Danamas Stabil',
+                  risk: 'Rendah',
+                  returnPercent: 4.25,
+                  amount: 500000,
+                ),
+                SizedBox(width: 12),
+                ReksadanaCard(
+                  title: 'Saham Hebat',
+                  risk: 'Tinggi',
+                  returnPercent: 15.2,
+                  amount: 250000,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: const NavBar(currentIndex: 0),
+    );
+  }
+}
+
+class _QuickAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isDark;
+
+  const _QuickAction({required this.icon, required this.label, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 26,
+          backgroundColor: isDark ? Colors.grey[700] : Colors.white,
+          child: Icon(icon, color: Colors.blueAccent, size: 30),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87)),
+      ],
     );
   }
 }

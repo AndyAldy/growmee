@@ -1,27 +1,28 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'routes/app_pages.dart';
-import 'screens/splash_screen.dart';
+import 'package:growmee/screens/auth/login_screen.dart';
+import 'package:growmee/theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const GrowME());
 }
 
-class MyApp extends StatelessWidget {
+class GrowME extends StatelessWidget {
+  const GrowME({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'GrowMee',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: SplashScreen(),
-      getPages: AppPages.routes,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      home: const LoginScreen(),
     );
   }
 }

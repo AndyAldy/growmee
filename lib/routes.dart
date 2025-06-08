@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/reksadana/reksadana_screen.dart';
 import 'screens/portfolio/portfolio_screen.dart';
 import 'screens/portfolio/portfolio_reksadana.dart';
 import 'screens/portfolio/portfolio_sekuritas.dart';
@@ -16,13 +17,13 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/': (context) => const LoginScreen(),
   '/register': (context) => const RegisterScreen(),
   '/home': (context) => const HomeScreen(),
-  '/portfolio': (context) => const PortfolioScreen(),
-  '/portfolio/reksadana': (context) => const PortfolioReksadana(),
-  '/portfolio/sekuritas': (context) => const PortfolioSekuritas(),
-  '/reksadana': (context) => const ReksaDanaScreen(),
+  '/portfolio': (context) => const PortfolioScreen(userId: '',),
+  '/portfolio/reksadana': (context) => PortfolioReksadanaScreen(userId: '',),
+  '/portfolio/sekuritas': (context) => PortfolioSekuritasScreen(userId: '',),
+  '/reksadana': (context) => const ReksadanaScreen(),
   '/profile': (context) => const ProfileScreen(),
   '/profile/risk': (context) => const ProfileRiskScreen(),
-  '/history/pembelian': (context) => const HistoryPembelianScreen(),
+  '/history/pembelian': (context) => HistoryPembelianScreen(),
   '/history/jual': (context) => const HistoryJualScreen(),
-  '/history/pengalihan': (context) => const HistoryPengalihanScreen(),
+  '/history/pengalihan': (context) => HistoryPengalihanScreen(),
 };
