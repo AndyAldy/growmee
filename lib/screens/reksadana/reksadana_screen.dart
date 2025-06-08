@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/reksadana_card.dart';
 
@@ -13,6 +14,10 @@ class ReksadanaScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
         elevation: 0,
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
       ),
       backgroundColor: const Color(0xFFE0F7FA), // biru langit
       body: ListView(

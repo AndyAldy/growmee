@@ -44,37 +44,42 @@ class DatabaseService {
         .snapshots();
   }
 
-  // Stream portofolio reksadana user tertentu (userId bisa uid saat ini atau lain)
-  Stream<QuerySnapshot<Map<String, dynamic>>> getReksadanaPortfolioStream(String userId) {
-    return _db
-        .collection('users')
-        .doc(userId)
-        .collection('portfolio_reksadana')
-        .snapshots();
-  }
+Stream<QuerySnapshot<Map<String, dynamic>>> getReksadanaPortfolioStream(String userId) {
+  if (userId.isEmpty) return const Stream.empty();
+  return _db
+      .collection('users')
+      .doc(userId)
+      .collection('portfolio_reksadana')
+      .snapshots();
+}
+Stream<QuerySnapshot<Map<String, dynamic>>> getCurrentUserReksadanaPortfolio() {
+  return getReksadanaPortfolioStream(uid);
+}
+Future<String?> getCurrentUserRiskLevel() {
+  return getUserRiskLevel(uid);
+}
 
-  // Stream portofolio sekuritas user tertentu
-  Stream<QuerySnapshot<Map<String, dynamic>>> getSekuritasPortfolioStream(String userId) {
-    return _db
-        .collection('users')
-        .doc(userId)
-        .collection('portfolio_sekuritas')
-        .snapshots();
-  }
+Stream<QuerySnapshot<Map<String, dynamic>>> getSekuritasPortfolioStream(String userId) {
+  if (userId.isEmpty) return const Stream.empty();
+  return _db
+      .collection('users')
+      .doc(userId)
+      .collection('portfolio_sekuritas')
+      .snapshots();
+}
 
-  // Ambil profil risiko user (async)
-  Future<String?> getUserRiskLevel(String userId) async {
-    final doc = await _db.collection('users').doc(userId).get();
-    return doc.data()?['riskLevel'] as String?;
-  }
+Future<String?> getUserRiskLevel(String userId) async {
+  if (userId.isEmpty) return null;
+  final doc = await _db.collection('users').doc(userId).get();
+  return doc.data()?['riskLevel'] as String?;
+}
 
-  // Set profil risiko user, merge supaya data lain tidak hilang
-  Future<void> setUserRiskLevel(String userId, String riskLevel) async {
-    await _db.collection('users').doc(userId).set(
-      {'riskLevel': riskLevel},
-      SetOptions(merge: true),
-    );
-  }
 
-  getPortfolioReksadanaStream() {}
+Future<void> setUserRiskLevel(String userId, String riskLevel) async {
+  if (userId.isEmpty) return;
+  await _db.collection('users').doc(userId).set(
+    {'riskLevel': riskLevel},
+    SetOptions(merge: true),
+  );
+}
 }

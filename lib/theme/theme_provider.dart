@@ -32,7 +32,12 @@ class AppTheme {
     ),
   );
 
-  var isDarkMode;
+  final BuildContext context;
 
-  AppTheme(BuildContext context);
+  AppTheme(this.context);
+
+  bool get isDarkMode {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    return brightness == Brightness.dark;
+  }
 }

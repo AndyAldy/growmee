@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/user_controller.dart';
 
@@ -24,7 +25,12 @@ class _ProfileRiskScreenState extends State<ProfileRiskScreen> {
     final userController = Provider.of<UserController>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil Risiko')),
+      appBar: AppBar(title: const Text('Profil Risiko'),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

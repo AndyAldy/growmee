@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../services/database_service.dart';
 import 'portfolio_reksadana.dart';
 import 'portfolio_sekuritas.dart';
@@ -22,7 +23,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Portofolio')),
+      appBar: AppBar(title: const Text('Portofolio'),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
+      ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

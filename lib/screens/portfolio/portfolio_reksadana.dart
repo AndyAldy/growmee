@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import '../../services/database_service.dart';
 
 class PortfolioReksadanaScreen extends StatelessWidget {
@@ -11,7 +12,12 @@ class PortfolioReksadanaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Portofolio Reksadana')),
+      appBar: AppBar(title: const Text('Portofolio Reksadana'),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dbService.getReksadanaPortfolioStream(userId),
         builder: (context, snapshot) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../controllers/user_controller.dart';
 import 'profile_risk_screen.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,12 @@ class ProfileScreen extends StatelessWidget {
     final user = userController.userModel;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(title: const Text('Profil'),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: user == null

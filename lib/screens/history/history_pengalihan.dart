@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import '../../../services/database_service.dart';
 
 class HistoryPengalihanScreen extends StatelessWidget {
@@ -10,7 +11,12 @@ class HistoryPengalihanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Riwayat Pengalihan')),
+      appBar: AppBar(title: const Text('Riwayat Pengalihan'),
+    leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Get.back(),
+  ),
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dbService.getHistoryPengalihanStream(),
         builder: (context, snapshot) {

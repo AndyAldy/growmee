@@ -58,7 +58,11 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   'Rp 12.500.000',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -76,7 +80,11 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 28),
           Text(
             'Rekomendasi Reksadana',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
           const SizedBox(height: 12),
           // Card Horizontal
@@ -125,7 +133,10 @@ class _QuickAction extends StatelessWidget {
           child: Icon(icon, color: Colors.blueAccent, size: 30),
         ),
         const SizedBox(height: 6),
-        Text(label, style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+        ),
       ],
     );
   }
