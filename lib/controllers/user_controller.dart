@@ -23,8 +23,6 @@ class UserController with ChangeNotifier {
       final doc = await _db.collection('users').doc(uid).get();
       if (doc.exists && doc.data() != null) {
         _userModel = UserModel.fromMap(doc.data()!, uid);
-      } else {
-        _userModel = null;
       }
 
       notifyListeners();

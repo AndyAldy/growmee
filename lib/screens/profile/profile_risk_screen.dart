@@ -14,12 +14,18 @@ class ProfileRiskScreen extends StatefulWidget {
 class _ProfileRiskScreenState extends State<ProfileRiskScreen> {
   String? _selectedRisk;
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
+  // Tunggu widget ter-build sebelum ambil data dari Provider
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     final userController = Provider.of<UserController>(context, listen: false);
-    _selectedRisk = userController.userModel?.riskLevel;
-  }
+    setState(() {
+      _selectedRisk = userController.userModel?.riskLevel;
+    });
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
