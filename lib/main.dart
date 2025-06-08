@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:growmee/screens/home_screen.dart';
+import 'routes.dart';
+import 'constants/colors.dart';
+import 'theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const GrowMEApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GrowMEApp extends StatelessWidget {
+  const GrowMEApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'GrowME',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'GrowME',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              scaffoldBackgroundColor: skyBlue,
+              brightness: Brightness.light,
+            ),
+            darkTheme: ThemeData.dark(),
+            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            initialRoute: '/',
+            routes: appRoutes,
+          );
+        },
       ),
-      home: HomeScreen(),
     );
   }
 }
