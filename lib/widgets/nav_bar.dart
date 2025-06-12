@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../utils/user_session.dart';
 
 class NavBar extends StatelessWidget {
   final int currentIndex;
-  final String userId;
 
-  const NavBar({super.key, required this.currentIndex, required this.userId});
+  const NavBar({super.key, required this.currentIndex});
 
   void _onTap(int index) {
     switch (index) {
       case 0:
-        Get.offAllNamed('/home', arguments: userId);
+        Get.offAllNamed('/home');
         break;
       case 1:
-        Get.offAllNamed('/portfolio', arguments: userId);
+        Get.offAllNamed('/portfolio');
         break;
       case 2:
-        Get.offAllNamed('/reksadana', arguments: userId);
+        Get.offAllNamed('/reksadana');
         break;
       case 3:
-      
-        Get.offAllNamed('/profile', arguments: userId, );
+
+        Get.offAllNamed('/profile');
         break;
     }
   }

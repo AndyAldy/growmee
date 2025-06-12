@@ -44,7 +44,7 @@ class ReksadanaScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: NavBar(currentIndex: 2, userId: userId.value),
+      bottomNavigationBar: NavBar(currentIndex: 2),
     );
   }
 }

@@ -14,10 +14,6 @@ class PortfolioSekuritasScreen extends StatelessWidget {
     final userId = Get.find<UserSession>().userId.value;
     return Scaffold(
       appBar: AppBar(title: const Text('Portofolio Sekuritas'),
-    leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => Get.back(),
-  ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dbService.getSekuritasPortfolioStream(userId),

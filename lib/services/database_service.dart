@@ -182,4 +182,33 @@ class DatabaseService {
       SetOptions(merge: true),
     );
   }
+
+  // Fungsi tambahan jika ingin akses saldo user lain (misal admin)
+  Future<num> getSaldoUser(String userId) async {
+    if (userId.isEmpty) return 0;
+    final doc = await _db.collection('users').doc(userId).get();
+    return (doc.data()?['saldo'] ?? 0) as num;
+  }
+
+  // Fungsi untuk menyimpan pengalihan
+  Future<void> simpanPengalihan({
+    required String dariProduk,
+    required String keProduk,
+    required num jumlah,
+    required num biayaPengalihan,
+  }) async {
+    if (uid.isEmpty) return;
+
+    final currentSaldo = await getCurrentSaldo();
+    final newSaldo = currentSaldo - biayaPengalihan;
+    await updateSaldo(newSaldo);
+
+    await _db.collection('users').doc(uid).collection('history_pengalihan').add({
+      'dari': dariProduk,
+      'ke': keProduk,
+      'jumlah': jumlah,
+      'biaya': biayaPengalihan,
+      'tanggal': FieldValue.serverTimestamp(),
+    });
+  }
 }

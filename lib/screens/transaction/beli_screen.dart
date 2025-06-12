@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../utils/user_session.dart';
 
 class BeliScreen extends StatefulWidget {
   const BeliScreen({super.key});
@@ -8,6 +10,21 @@ class BeliScreen extends StatefulWidget {
   @override
   State<BeliScreen> createState() => _BeliScreenState();
 }
+Future<void> simpanPenjualan(String produk, int jumlah) async {
+    final session = Get.find<UserSession>();
+    final userId = session.userId.value;
+  if (userId.isEmpty) {
+    Get.snackbar('Error', 'Session user tidak ditemukan');
+    return;
+  }
+  await FirebaseFirestore.instance.collection('pembelian').add({
+    'produk': produk,
+    'jumlah': jumlah,
+    'userId': userId,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
+}
+
 
 class _BeliScreenState extends State<BeliScreen> {
   final TextEditingController _productController = TextEditingController();

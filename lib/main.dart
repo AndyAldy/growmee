@@ -8,12 +8,16 @@ import 'routes.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import '../../../utils/helpers.dart';
+import '../../utils/user_session.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // ✅ Tambahkan ini SEBELUM runApp
+  Get.put(UserSession());
 
   final user = FirebaseAuth.instance.currentUser;
 

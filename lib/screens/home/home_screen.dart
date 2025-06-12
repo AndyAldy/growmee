@@ -14,15 +14,17 @@ import '../../utils/user_session.dart'; // Tambahkan ini
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = AppTheme(context);
-    final isDark = themeProvider.isDarkMode;
+@override
+Widget build(BuildContext context) {
+  final themeProvider = AppTheme(context);
+  final isDark = themeProvider.isDarkMode;
 
-    final session = Get.find<UserSession>();
-    final userId = session.userId.value;
+  final session = Get.find<UserSession>();
 
-    print('User ID: $userId');
+  // Tampilkan userId secara reaktif di console saat nilai berubah
+  session.userId.listen((id) {
+    print('[HomeScreen] User ID from session: $id');
+  });
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
@@ -139,7 +141,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: NavBar(currentIndex: 0, userId: userId),
+      bottomNavigationBar: NavBar(currentIndex: 0),
     );
   }
 }

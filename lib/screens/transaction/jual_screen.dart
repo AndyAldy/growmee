@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../utils/user_session.dart'; // pastikan path ini sesuai
 
 class JualScreen extends StatefulWidget {
   const JualScreen({super.key});
 
   @override
   State<JualScreen> createState() => _JualScreenState();
+}
+
+// Fungsi simpan data penjualan
+Future<void> simpanPenjualan(String produk, int jumlah) async {
+    final session = Get.find<UserSession>();
+    final userId = session.userId.value;
+  if (userId.isEmpty) {
+    Get.snackbar('Error', 'Session user tidak ditemukan');
+    return;
+  }
+
+  await FirebaseFirestore.instance.collection('penjualan').add({
+    'produk': produk,
+    'jumlah': jumlah,
+    'userId': userId,
+    'timestamp': FieldValue.serverTimestamp(),
+    'status': 'pending', // opsional
+  });
 }
 
 class _JualScreenState extends State<JualScreen> {
@@ -22,6 +41,7 @@ class _JualScreenState extends State<JualScreen> {
       Get.snackbar('Error', 'Semua kolom harus diisi');
       return;
     }
+
     final amount = int.tryParse(amountText);
     if (amount == null || amount <= 0) {
       Get.snackbar('Error', 'Jumlah jual harus valid');
@@ -30,11 +50,7 @@ class _JualScreenState extends State<JualScreen> {
 
     setState(() => _loading = true);
     try {
-      await FirebaseFirestore.instance.collection('penjualan').add({
-        'produk': product,
-        'jumlah': amount,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+      await simpanPenjualan(product, amount);
       Get.snackbar('Sukses', 'Penjualan berhasil disimpan');
       _productController.clear();
       _amountController.clear();
