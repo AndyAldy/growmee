@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../services/database_service.dart';
+import '../../utils/user_session.dart';
 
 class PortfolioSekuritasScreen extends StatelessWidget {
-  final String userId;
   final DatabaseService _dbService = DatabaseService();
+  PortfolioSekuritasScreen({super.key});
 
-  PortfolioSekuritasScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
+    final userId = Get.find<UserSession>().userId.value;
     return Scaffold(
       appBar: AppBar(title: const Text('Portofolio Sekuritas'),
     leading: IconButton(

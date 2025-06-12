@@ -11,36 +11,21 @@ import 'screens/profile/profile_risk_screen.dart';
 import 'screens/history/history_pembelian.dart';
 import 'screens/history/history_jual.dart';
 import 'screens/history/history_pengalihan.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 final List<GetPage> appPages = [
   GetPage(name: '/', page: () => const LoginScreen()),
   GetPage(name: '/register', page: () => const RegisterScreen()),
 
-  // HomeScreen menerima argumen userId dari Get.arguments
-  GetPage(
-    name: '/home',
-    page: () => HomeScreen(userId: Get.arguments['userId']),
-  ),
-
-  GetPage(
-    name: '/portfolio',
-    page: () => PortfolioScreen(userId: Get.arguments['userId']),
-  ),
-
-  GetPage(
-    name: '/portfolio/reksadana',
-    page: () => PortfolioReksadanaScreen(userId: Get.arguments['userId']),
-  ),
-
-  GetPage(
-    name: '/portfolio/sekuritas',
-    page: () => PortfolioSekuritasScreen(userId: Get.arguments['userId']),
-  ),
-
-  GetPage(name: '/reksadana', page: () => const ReksadanaScreen()),
+  // Halaman yang sudah pakai UserSession, tidak perlu argumen lagi
+  GetPage(name: '/home', page: () => const HomeScreen()),
+  GetPage(name: '/portfolio', page: () => const PortfolioScreen()),
+  GetPage(name: '/portfolio/reksadana', page: () => PortfolioReksadanaScreen()),
+  GetPage(name: '/portfolio/sekuritas', page: () => PortfolioSekuritasScreen()),
+  GetPage(name: '/reksadana', page: () => ReksadanaScreen()),
   GetPage(name: '/profile', page: () => const ProfileScreen()),
   GetPage(name: '/profilerisk', page: () => const ProfileRiskScreen()),
+
+  // Riwayat juga ambil userId dari UserSession
   GetPage(name: '/history/pembelian', page: () => HistoryPembelianScreen()),
   GetPage(name: '/history/jual', page: () => const HistoryJualScreen()),
   GetPage(name: '/history/pengalihan', page: () => HistoryPengalihanScreen()),

@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import '../../services/database_service.dart';
+import '../../utils/user_session.dart';
 
 class PortfolioReksadanaScreen extends StatelessWidget {
-  final String userId;
   final DatabaseService _dbService = DatabaseService();
 
-  PortfolioReksadanaScreen({super.key, required this.userId});
+  PortfolioReksadanaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSession>();
+    final userId = session.userId.value;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Portofolio Reksadana'),
-    leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => Get.back(),
-  ),
+      appBar: AppBar(
+        title: const Text('Portofolio Reksadana'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dbService.getReksadanaPortfolioStream(userId),

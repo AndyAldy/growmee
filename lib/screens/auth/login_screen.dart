@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:growmee/controllers/user_controller.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:growmee/controllers/auth_controller.dart';
+import '../../services/database_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,42 +13,92 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final LocalAuthentication auth = LocalAuthentication();
+  final AuthController authController = Get.put(AuthController());
+
   bool _isLoading = false;
   String? _error;
+  
+@override
+void initState() {
+  super.initState();
+  Get.put(UserController()); // Inject UserController
+}
 
-  Future<void> _login() async {
+Future<void> _login() async {
+  setState(() {
+    _isLoading = true;
+    _error = null;
+  });
+
+  try {
+    await authController.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    final userId = authController.userId;
+    final email = _emailController.text.trim();
+
+    if (userId != null) {
+      final userController = Get.find<UserController>();
+      final exists = await userController.checkUserExists(userId);
+
+      if (!exists) {
+        await userController.saveInitialUserData(userId, email, ''); // kosongkan nama untuk sekarang
+      }
+
+      Get.offAllNamed('/home', arguments: {'userId': userId});
+    } else {
+      setState(() {
+        _error = 'Login gagal: ID pengguna tidak ditemukan.';
+      });
+    }
+  } catch (e) {
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _error = 'Login gagal: $e';
     });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
+  Future<void> _loginWithBiometrics() async {
+    bool isAuthenticated = false;
 
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      bool canCheckBiometrics = await auth.canCheckBiometrics;
+      bool isDeviceSupported = await auth.isDeviceSupported();
 
-      if (userCredential.user != null) {
-        final userId = userCredential.user!.uid;
-        print('Login berhasil: ${userCredential.user!.email}, UID: $userId');
-        Get.offAllNamed('/home', arguments: userId); // Kirim userId ke halaman berikutnya
+      if (canCheckBiometrics && isDeviceSupported) {
+        isAuthenticated = await auth.authenticate(
+          localizedReason: 'Gunakan biometrik untuk login',
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+            stickyAuth: true,
+          ),
+        );
       }
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = e.message ?? 'Login gagal';
-      });
     } catch (e) {
       setState(() {
-        _error = 'Terjadi kesalahan: $e';
+        _error = 'Autentikasi biometrik gagal: $e';
       });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    }
+
+    if (isAuthenticated) {
+      final userId = authController.userId;
+      if (userId != null) {
+        Get.offAllNamed('/home', arguments: {'userId': userId});
+      } else {
+        setState(() {
+          _error = 'Silakan login manual terlebih dahulu untuk mengaktifkan fingerprint.';
+        });
+      }
     }
   }
 
@@ -90,6 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextButton(
                   onPressed: () => Get.toNamed('/register'),
                   child: const Text('Daftar Akun'),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: _loginWithBiometrics,
+                  icon: const Icon(Icons.fingerprint),
+                  label: const Text('Login dengan Fingerprint'),
                 ),
               ],
             ),

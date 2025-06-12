@@ -3,21 +3,24 @@ import 'package:get/get.dart';
 
 class NavBar extends StatelessWidget {
   final int currentIndex;
-  const NavBar({super.key, required this.currentIndex});
+  final String userId;
+
+  const NavBar({super.key, required this.currentIndex, required this.userId});
 
   void _onTap(int index) {
     switch (index) {
       case 0:
-        Get.offAllNamed('/home');
+        Get.offAllNamed('/home', arguments: userId);
         break;
       case 1:
-        Get.offAllNamed('/portfolio');
+        Get.offAllNamed('/portfolio', arguments: userId);
         break;
       case 2:
-        Get.offAllNamed('/reksadana');
+        Get.offAllNamed('/reksadana', arguments: userId);
         break;
       case 3:
-        Get.offAllNamed('/profile');
+      
+        Get.offAllNamed('/profile', arguments: userId, );
         break;
     }
   }

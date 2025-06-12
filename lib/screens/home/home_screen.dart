@@ -7,17 +7,23 @@ import '../../theme/theme_provider.dart';
 import '../transaction/topup_screen.dart';
 import '../transaction/beli_screen.dart';
 import '../transaction/jual_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required userId});
+import '../../models/user_model.dart';
+import '../../utils/user_session.dart'; // Tambahkan ini
 
-@override
-Widget build(BuildContext context) {
-  final themeProvider = AppTheme(context);
-  final isDark = themeProvider.isDarkMode;
-  final userId = Get.find<AuthController>().userId;
-  print('User ID: $userId');
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = AppTheme(context);
+    final isDark = themeProvider.isDarkMode;
+
+    final session = Get.find<UserSession>();
+    final userId = session.userId.value;
+
+    print('User ID: $userId');
+
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
       appBar: AppBar(
@@ -133,7 +139,7 @@ Widget build(BuildContext context) {
           ),
         ],
       ),
-      bottomNavigationBar: const NavBar(currentIndex: 0),
+      bottomNavigationBar: NavBar(currentIndex: 0, userId: userId),
     );
   }
 }
@@ -154,7 +160,7 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // ⬅️ Navigasi saat dipencet
+      onTap: onTap,
       child: Column(
         children: [
           CircleAvatar(

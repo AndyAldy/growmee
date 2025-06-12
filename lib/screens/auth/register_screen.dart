@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import '../../controllers/user_controller.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,6 +12,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -18,13 +20,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   String? _error;
 
+@override
+void initState() {
+  super.initState();
+  Get.put(UserController());
+}
+
   Future<void> _register() async {
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // Validasi sederhana
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       setState(() {
         _error = 'Semua field harus diisi';
       });
@@ -44,11 +52,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      Get.offAllNamed('/'); // Kembali ke LoginScreen
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final userId = _auth.currentUser?.uid;
+
+      if (userId != null) {
+        final userController = Get.put(UserController());
+        await userController.saveInitialUserData(userId, email, name);
+      }
+
+      Get.offAllNamed('/'); // atau rute dashboard/home
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message ?? 'Terjadi kesalahan';
@@ -78,6 +90,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Nama Lengkap'),
+                ),
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(labelText: 'Email'),

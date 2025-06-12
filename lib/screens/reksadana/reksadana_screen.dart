@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/reksadana_card.dart';
+import '../../screens/home/home_screen.dart';
+import '../../utils/user_session.dart';
 
 class ReksadanaScreen extends StatelessWidget {
-  const ReksadanaScreen({super.key});
+  ReksadanaScreen({super.key});
+
+  final userId = Get.find<UserSession>().userId;
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +18,14 @@ class ReksadanaScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
         elevation: 0,
-    leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => Get.back(),
-  ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Get.to(() => HomeScreen());
+          },
+        ),
       ),
-      backgroundColor: const Color(0xFFE0F7FA), // biru langit
+      backgroundColor: const Color(0xFFE0F7FA),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
@@ -38,7 +44,7 @@ class ReksadanaScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const NavBar(currentIndex: 2),
+      bottomNavigationBar: NavBar(currentIndex: 2, userId: userId.value),
     );
   }
 }
