@@ -29,11 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
-if (userCredential.user != null) {
-  print('Login berhasil: ${userCredential.user!.email}');
-  Get.offAllNamed('/home');
-}
-
+      if (userCredential.user != null) {
+        final userId = userCredential.user!.uid;
+        print('Login berhasil: ${userCredential.user!.email}, UID: $userId');
+        Get.offAllNamed('/home', arguments: userId); // Kirim userId ke halaman berikutnya
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message ?? 'Login gagal';

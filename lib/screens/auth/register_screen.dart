@@ -23,6 +23,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
+    // Validasi sederhana
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      setState(() {
+        _error = 'Semua field harus diisi';
+      });
+      return;
+    }
+
     if (password != confirmPassword) {
       setState(() {
         _error = 'Password dan konfirmasi tidak cocok';
@@ -36,8 +44,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      Get.offAllNamed('/login'); // Navigasi langsung ke halaman utama setelah daftar
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      Get.offAllNamed('/'); // Kembali ke LoginScreen
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message ?? 'Terjadi kesalahan';
@@ -97,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 TextButton(
-                  onPressed: () => Get.back(), // Kembali ke login
+                  onPressed: () => Get.back(),
                   child: const Text('Sudah punya akun? Masuk di sini'),
                 ),
               ],

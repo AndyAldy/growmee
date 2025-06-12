@@ -16,9 +16,27 @@ final List<GetPage> appPages = [
   GetPage(name: '/', page: () => const LoginScreen()),
   GetPage(name: '/register', page: () => const RegisterScreen()),
   GetPage(name: '/home', page: () => const HomeScreen()),
-  GetPage(name: '/portfolio', page: () => PortfolioScreen(userId: '')),
-  GetPage(name: '/portfolio/reksadana', page: () => PortfolioReksadanaScreen(userId: '')),
-  GetPage(name: '/portfolio/sekuritas', page: () => PortfolioSekuritasScreen(userId: '')),
+  GetPage(
+    name: '/portfolio',
+    page: () {
+      final userId = Get.arguments ?? '';
+      return PortfolioScreen(userId: userId);
+    },
+  ),
+  GetPage(
+    name: '/portfolio/reksadana',
+    page: () {
+      final userId = Get.arguments ?? '';
+      return PortfolioReksadanaScreen(userId: userId);
+    },
+  ),
+  GetPage(
+    name: '/portfolio/sekuritas',
+    page: () {
+      final userId = Get.arguments ?? '';
+      return PortfolioSekuritasScreen(userId: userId);
+    },
+  ),
   GetPage(name: '/reksadana', page: () => const ReksadanaScreen()),
   GetPage(name: '/profile', page: () => const ProfileScreen()),
   GetPage(name: '/profilerisk', page: () => const ProfileRiskScreen()),
