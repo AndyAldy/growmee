@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:growmee/controllers/auth_controller.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/reksadana_card.dart';
 import '../../theme/theme_provider.dart';
 import '../transaction/topup_screen.dart';
 import '../transaction/beli_screen.dart';
 import '../transaction/jual_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required userId});
 
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = AppTheme(context);
-    final isDark = themeProvider.isDarkMode;
-
+@override
+Widget build(BuildContext context) {
+  final themeProvider = AppTheme(context);
+  final isDark = themeProvider.isDarkMode;
+  final userId = Get.find<AuthController>().userId;
+  print('User ID: $userId');
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
       appBar: AppBar(

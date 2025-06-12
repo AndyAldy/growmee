@@ -11,32 +11,33 @@ import 'screens/profile/profile_risk_screen.dart';
 import 'screens/history/history_pembelian.dart';
 import 'screens/history/history_jual.dart';
 import 'screens/history/history_pengalihan.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final List<GetPage> appPages = [
   GetPage(name: '/', page: () => const LoginScreen()),
   GetPage(name: '/register', page: () => const RegisterScreen()),
-  GetPage(name: '/home', page: () => const HomeScreen()),
+
+  // HomeScreen menerima argumen userId dari Get.arguments
+  GetPage(
+    name: '/home',
+    page: () => HomeScreen(userId: Get.arguments['userId']),
+  ),
+
   GetPage(
     name: '/portfolio',
-    page: () {
-      final userId = Get.arguments ?? '';
-      return PortfolioScreen(userId: userId);
-    },
+    page: () => PortfolioScreen(userId: Get.arguments['userId']),
   ),
+
   GetPage(
     name: '/portfolio/reksadana',
-    page: () {
-      final userId = Get.arguments ?? '';
-      return PortfolioReksadanaScreen(userId: userId);
-    },
+    page: () => PortfolioReksadanaScreen(userId: Get.arguments['userId']),
   ),
+
   GetPage(
     name: '/portfolio/sekuritas',
-    page: () {
-      final userId = Get.arguments ?? '';
-      return PortfolioSekuritasScreen(userId: userId);
-    },
+    page: () => PortfolioSekuritasScreen(userId: Get.arguments['userId']),
   ),
+
   GetPage(name: '/reksadana', page: () => const ReksadanaScreen()),
   GetPage(name: '/profile', page: () => const ProfileScreen()),
   GetPage(name: '/profilerisk', page: () => const ProfileRiskScreen()),

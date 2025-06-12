@@ -87,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'growme-91008.firebasestorage.app',
     measurementId: 'G-HL1BTN2EL2',
   );
+
 }

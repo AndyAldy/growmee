@@ -5,6 +5,7 @@ class AuthController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   User? get user => _auth.currentUser;
+  String? get userId => _auth.currentUser?.uid;
 
   bool get isLoggedIn => user != null;
 

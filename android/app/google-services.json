@@ -29,6 +29,13 @@
             {
               "client_id": "1062899694013-cao6b6l0kananua4e81ssd83k80e7cfa.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1062899694013-oq391bjcpi02gcdfu0lvr59q1prhlh1g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.growmee"
+              }
             }
           ]
         }
