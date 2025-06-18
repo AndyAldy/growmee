@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:growmee/controllers/user_controller.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:growmee/controllers/auth_controller.dart';
+import 'package:growmee/controllers/user_controller.dart';
+import 'package:growmee/utils/user_session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,55 +18,67 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final LocalAuthentication auth = LocalAuthentication();
   final AuthController authController = Get.put(AuthController());
+  late final UserSession userSession;
 
   bool _isLoading = false;
   String? _error;
-  
-@override
-void initState() {
-  super.initState();
-  Get.put(UserController()); // Inject UserController
-}
 
-Future<void> _login() async {
-  setState(() {
-    _isLoading = true;
-    _error = null;
-  });
+  @override
+  void initState() {
+    super.initState();
+    Get.put(UserController());
+    userSession = Get.put(UserSession(), permanent: true);
+  }
 
-  try {
-    await authController.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
-    final userId = authController.userId;
-    final email = _emailController.text.trim();
+    try {
+      await authController.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
 
-    if (userId != null) {
-      final userController = Get.find<UserController>();
-      final exists = await userController.checkUserExists(userId);
+      final userId = authController.userId;
+      final email = _emailController.text.trim();
 
-      if (!exists) {
-        await userController.saveInitialUserData(userId, email, ''); // kosongkan nama untuk sekarang
+      if (userId != null) {
+        final userController = Get.find<UserController>();
+        final exists = await userController.checkUserExists(userId);
+
+        // Simpan data awal jika belum ada
+        if (!exists) {
+          await userController.saveInitialUserData(userId, email, ''); // nama default kosong
+        }
+
+        // Ambil data user setelah login
+        await userController.fetchUserData(userId);
+        final name = userController.userModel?.name ?? '';
+
+        // Simpan ke session global
+        userSession.setUserId(userId);
+        userSession.setUserName(name);
+
+        // Pindah ke Home
+        Get.offAllNamed('/home', arguments: {'userId': userId});
+      } else {
+        setState(() {
+          _error = 'Login gagal: ID pengguna tidak ditemukan.';
+        });
       }
-
-      Get.offAllNamed('/home', arguments: {'userId': userId});
-    } else {
+    } catch (e) {
       setState(() {
-        _error = 'Login gagal: ID pengguna tidak ditemukan.';
+        _error = 'Login gagal: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
-  } catch (e) {
-    setState(() {
-      _error = 'Login gagal: $e';
-    });
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
 
   Future<void> _loginWithBiometrics() async {
     bool isAuthenticated = false;
@@ -92,6 +105,13 @@ Future<void> _login() async {
     if (isAuthenticated) {
       final userId = authController.userId;
       if (userId != null) {
+        final userController = Get.find<UserController>();
+        await userController.fetchUserData(userId);
+        final name = userController.userModel?.name ?? '';
+
+        userSession.setUserId(userId);
+        userSession.setUserName(name);
+
         Get.offAllNamed('/home', arguments: {'userId': userId});
       } else {
         setState(() {

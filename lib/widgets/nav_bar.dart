@@ -12,13 +12,12 @@ class NavBar extends StatelessWidget {
         Get.offAllNamed('/home');
         break;
       case 1:
-        Get.offAllNamed('/portfolio');
+        Get.toNamed('/live');
         break;
       case 2:
-        Get.offAllNamed('/reksadana');
+        Get.offAllNamed('/edu');
         break;
       case 3:
-
         Get.offAllNamed('/profile');
         break;
     }
@@ -35,8 +34,8 @@ class NavBar extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: 'Portofolio'),
-        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Reksa Dana'),
+        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Live Chart'),
+        BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: 'Edukasi ReksaDana'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],
     );

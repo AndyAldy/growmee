@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import '../../controllers/user_controller.dart';
+import 'package:growmee/controllers/user_controller.dart';
+import 'package:growmee/utils/user_session.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,14 +18,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
+  final userController = Get.put(UserController());
+  final userSession = Get.put(UserSession());
+
   bool _isLoading = false;
   String? _error;
-
-@override
-void initState() {
-  super.initState();
-  Get.put(UserController());
-}
 
   Future<void> _register() async {
     final name = _nameController.text.trim();
@@ -33,16 +31,12 @@ void initState() {
     final confirmPassword = _confirmPasswordController.text;
 
     if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      setState(() {
-        _error = 'Semua field harus diisi';
-      });
+      setState(() => _error = 'Semua field harus diisi');
       return;
     }
 
     if (password != confirmPassword) {
-      setState(() {
-        _error = 'Password dan konfirmasi tidak cocok';
-      });
+      setState(() => _error = 'Password dan konfirmasi tidak cocok');
       return;
     }
 
@@ -56,23 +50,22 @@ void initState() {
       final userId = _auth.currentUser?.uid;
 
       if (userId != null) {
-        final userController = Get.put(UserController());
         await userController.saveInitialUserData(userId, email, name);
-      }
+        await userController.fetchUserData(userId);
 
-      Get.offAllNamed('/'); // atau rute dashboard/home
+        userSession.setUserId(userId);
+        userSession.setUserName(name);
+
+        Get.offAllNamed('/home', arguments: {'userId': userId});
+      } else {
+        setState(() => _error = 'Pendaftaran gagal: user ID tidak ditemukan');
+      }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = e.message ?? 'Terjadi kesalahan';
-      });
+      setState(() => _error = e.message ?? 'Terjadi kesalahan');
     } catch (e) {
-      setState(() {
-        _error = 'Error: $e';
-      });
+      setState(() => _error = 'Error: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 

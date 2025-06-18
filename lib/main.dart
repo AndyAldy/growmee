@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import '../../../utils/helpers.dart';
 import '../../utils/user_session.dart';
+import 'controllers/chart_data_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,8 +18,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // ✅ Tambahkan ini SEBELUM runApp
-  Get.put(UserSession());
+  // ✅ Tambahkan semua controller yang dibutuhkan sebelum runApp
+  Get.put(UserSession(), permanent: true);
+  Get.put(ChartDataController(), permanent: true);
 
   final user = FirebaseAuth.instance.currentUser;
 
@@ -30,7 +33,6 @@ void main() async {
     ),
   );
 }
-
 
 class GrowME extends StatelessWidget {
   final String initialRoute;
@@ -52,7 +54,6 @@ class GrowME extends StatelessWidget {
       themeMode: ThemeMode.system,
       initialRoute: initialRoute,
       getPages: appPages,
-      // Agar userId tetap dibawa saat auto-login
       onGenerateRoute: (settings) {
         return GetPageRoute(
           settings: settings,

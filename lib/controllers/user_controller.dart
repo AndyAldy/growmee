@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
+import 'package:get/get.dart';
+import '../utils/user_session.dart';
+
 
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -34,26 +37,33 @@ Future<bool> checkUserExists(String userId) async {
   }
 
   // Fungsi untuk mengambil data user
-  Future<void> fetchUserData(String userId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+Future<void> fetchUserData(String userId) async {
+  final uid = _auth.currentUser?.uid;
+  if (uid == null) return;
 
-    try {
-      final doc = await _db.collection('users').doc(uid).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        _userModel = UserModel(
-          uid: uid,
-          email: data['email'] ?? '',
-          name: data['name'] ?? '',
-          riskLevel: data['riskLevel'],
-        );
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
+  try {
+    final doc = await _db.collection('users').doc(uid).get();
+    if (doc.exists) {
+      final data = doc.data()!;
+      _userModel = UserModel(
+        uid: uid,
+        email: data['email'] ?? '',
+        name: data['name'] ?? '',
+        riskLevel: data['riskLevel'],
+      );
+
+      // ✅ Set ke session
+      final session = Get.find<UserSession>();
+      session.setUserId(uid);
+      session.setUserName(_userModel!.name ?? '');
+
+      notifyListeners();
     }
+  } catch (e) {
+    print('Error fetching user data: $e');
   }
+}
+
   void updateRiskLevel(String val) async {
   final uid = _auth.currentUser?.uid;
   if (uid == null) return;

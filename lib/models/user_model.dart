@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:growmee/utils/user_session.dart';
 
 class UserModel {
   final String uid;
@@ -54,5 +55,11 @@ class UserModel {
       riskLevel: data['riskLevel'],
       name: data['name'],
     );
+  }
+
+  // Tambahan untuk update session
+  void updateSession(UserSession session) {
+    session.setUserId(uid);
+    session.setUserName(name ?? '');
   }
 }

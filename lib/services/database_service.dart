@@ -7,7 +7,7 @@ class DatabaseService {
 
   String get uid => _auth.currentUser?.uid ?? '';
 
-  // Stream riwayat jual user saat ini
+  /// Stream riwayat jual user saat ini
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistoryJualStream() {
     if (uid.isEmpty) return const Stream.empty();
     return _db
@@ -18,7 +18,7 @@ class DatabaseService {
         .snapshots();
   }
 
-  // Stream riwayat pembelian user
+  /// Stream riwayat pembelian user
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistoryPembelianStream() {
     if (uid.isEmpty) return const Stream.empty();
     return _db
@@ -29,7 +29,7 @@ class DatabaseService {
         .snapshots();
   }
 
-  // Stream riwayat pengalihan user
+  /// Stream riwayat pengalihan user
   Stream<QuerySnapshot<Map<String, dynamic>>> getHistoryPengalihanStream() {
     if (uid.isEmpty) return const Stream.empty();
     return _db
@@ -40,25 +40,14 @@ class DatabaseService {
         .snapshots();
   }
 
-  // Stream riwayat topup user
-  Stream<QuerySnapshot<Map<String, dynamic>>> getHistoryTopupStream() {
-    if (uid.isEmpty) return const Stream.empty();
-    return _db
-        .collection('users')
-        .doc(uid)
-        .collection('history_topup')
-        .orderBy('tanggal', descending: true)
-        .snapshots();
-  }
-
-  // Dapatkan saldo user sekarang
+  /// Get current user saldo
   Future<num> getCurrentSaldo() async {
     if (uid.isEmpty) return 0;
     final doc = await _db.collection('users').doc(uid).get();
     return (doc.data()?['saldo'] ?? 0) as num;
   }
 
-  // Update saldo user dengan nilai baru
+  /// Update user saldo
   Future<void> updateSaldo(num newSaldo) async {
     if (uid.isEmpty) return;
     await _db.collection('users').doc(uid).set({
@@ -66,131 +55,92 @@ class DatabaseService {
     }, SetOptions(merge: true));
   }
 
-  // Fungsi Top Up
+  /// Top up saldo
   Future<void> topUp({required num amount}) async {
     if (uid.isEmpty) return;
-
     final currentSaldo = await getCurrentSaldo();
-
-    // Tambah saldo
     final newSaldo = currentSaldo + amount;
-
-    // Update saldo di dokumen user
     await updateSaldo(newSaldo);
-
-    // Simpan riwayat topup
-    await _db
-        .collection('users')
-        .doc(uid)
-        .collection('history_topup')
-        .add({
+    await _db.collection('users').doc(uid).collection('history_topup').add({
       'jumlah': amount,
       'tanggal': FieldValue.serverTimestamp(),
     });
   }
 
-  // Fungsi Jual (mengurangi investasi, menambah saldo)
+  /// Proses jual produk
   Future<void> jual({required String produk, required num jumlah, required num hasilJual}) async {
     if (uid.isEmpty) return;
-
     final currentSaldo = await getCurrentSaldo();
     final newSaldo = currentSaldo + hasilJual;
-
-    // Update saldo user
     await updateSaldo(newSaldo);
-
-    // Simpan riwayat jual
-    await _db
-        .collection('users')
-        .doc(uid)
-        .collection('history_jual')
-        .add({
+    await _db.collection('users').doc(uid).collection('history_jual').add({
       'produk': produk,
       'jumlah': jumlah,
       'hasil': hasilJual,
       'tanggal': FieldValue.serverTimestamp(),
     });
-
-    // TODO: Update portfolio_reksadana atau portfolio_sekuritas sesuai penjualan (kurangi jumlah investasi)
   }
 
-  // Fungsi Beli (mengurangi saldo, menambah investasi)
+  /// Proses beli produk
   Future<void> beli({required String produk, required num jumlah, required num hargaTotal}) async {
     if (uid.isEmpty) return;
-
     final currentSaldo = await getCurrentSaldo();
-    if (currentSaldo < hargaTotal) {
-      throw Exception('Saldo tidak cukup');
-    }
+    if (currentSaldo < hargaTotal) throw Exception('Saldo tidak cukup');
     final newSaldo = currentSaldo - hargaTotal;
-
-    // Update saldo user
     await updateSaldo(newSaldo);
-
-    // Simpan riwayat pembelian
-    await _db
-        .collection('users')
-        .doc(uid)
-        .collection('history_pembelian')
-        .add({
+    await _db.collection('users').doc(uid).collection('history_pembelian').add({
       'produk': produk,
       'jumlah': jumlah,
       'harga_total': hargaTotal,
       'tanggal': FieldValue.serverTimestamp(),
     });
-
-    // TODO: Update portfolio_reksadana atau portfolio_sekuritas sesuai pembelian (tambah jumlah investasi)
   }
 
-  // Fungsi lain (portfolio, riskLevel, dll) seperti di kode kamu sebelumnya
+  /// Portfolio reksadana user tertentu
   Stream<QuerySnapshot<Map<String, dynamic>>> getReksadanaPortfolioStream(String userId) {
     if (userId.isEmpty) return const Stream.empty();
-    return _db
-        .collection('users')
-        .doc(userId)
-        .collection('portfolio_reksadana')
-        .snapshots();
+    return _db.collection('users').doc(userId).collection('portfolio_reksadana').snapshots();
   }
 
+  /// Portfolio reksadana user login saat ini
   Stream<QuerySnapshot<Map<String, dynamic>>> getCurrentUserReksadanaPortfolio() {
     return getReksadanaPortfolioStream(uid);
   }
 
-  Future<String?> getCurrentUserRiskLevel() {
-    return getUserRiskLevel(uid);
-  }
-
+  /// Portfolio sekuritas user tertentu
   Stream<QuerySnapshot<Map<String, dynamic>>> getSekuritasPortfolioStream(String userId) {
     if (userId.isEmpty) return const Stream.empty();
-    return _db
-        .collection('users')
-        .doc(userId)
-        .collection('portfolio_sekuritas')
-        .snapshots();
+    return _db.collection('users').doc(userId).collection('portfolio_sekuritas').snapshots();
   }
 
+  /// Mendapatkan risk level user
   Future<String?> getUserRiskLevel(String userId) async {
     if (userId.isEmpty) return null;
     final doc = await _db.collection('users').doc(userId).get();
     return doc.data()?['riskLevel'] as String?;
   }
 
+  /// Set risk level user
   Future<void> setUserRiskLevel(String userId, String riskLevel) async {
     if (userId.isEmpty) return;
-    await _db.collection('users').doc(userId).set(
-      {'riskLevel': riskLevel},
-      SetOptions(merge: true),
-    );
+    await _db.collection('users').doc(userId).set({
+      'riskLevel': riskLevel,
+    }, SetOptions(merge: true));
   }
 
-  // Fungsi tambahan jika ingin akses saldo user lain (misal admin)
+  /// Risk level user saat ini
+  Future<String?> getCurrentUserRiskLevel() {
+    return getUserRiskLevel(uid);
+  }
+
+  /// Ambil saldo user lain
   Future<num> getSaldoUser(String userId) async {
     if (userId.isEmpty) return 0;
     final doc = await _db.collection('users').doc(userId).get();
     return (doc.data()?['saldo'] ?? 0) as num;
   }
 
-  // Fungsi untuk menyimpan pengalihan
+  /// Simpan riwayat pengalihan
   Future<void> simpanPengalihan({
     required String dariProduk,
     required String keProduk,
@@ -198,11 +148,9 @@ class DatabaseService {
     required num biayaPengalihan,
   }) async {
     if (uid.isEmpty) return;
-
     final currentSaldo = await getCurrentSaldo();
     final newSaldo = currentSaldo - biayaPengalihan;
     await updateSaldo(newSaldo);
-
     await _db.collection('users').doc(uid).collection('history_pengalihan').add({
       'dari': dariProduk,
       'ke': keProduk,
@@ -210,5 +158,31 @@ class DatabaseService {
       'biaya': biayaPengalihan,
       'tanggal': FieldValue.serverTimestamp(),
     });
+  }
+
+  /// Ambil daftar reksadana market
+  Future<List<Map<String, dynamic>>> fetchAllReksadanaMarket() async {
+    final snapshot = await _db.collection('reksadana_market').get();
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
+  /// Ambil data reksadana berdasarkan ID
+  Future<Map<String, dynamic>?> fetchReksadanaById(String id) async {
+    final doc = await _db.collection('reksadana_market').doc(id).get();
+    return doc.exists ? doc.data() : null;
+  }
+    Future<List<Map<String, dynamic>>> fetchReksadanaMarket() async {
+    final snapshot = await _db.collection('reksadana_market').get();
+
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return {
+        'id': doc.id,
+        'name': data['name'] ?? '',
+        'type': data['type'] ?? '',
+        'price': data['price'] ?? 0,
+        'return': data['Keuntungan'] ?? 0.0,
+      };
+    }).toList();
   }
 }

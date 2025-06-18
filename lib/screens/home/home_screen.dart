@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:growmee/screens/portfolio/Chart_screen.dart';
+import 'package:intl/intl.dart';
 import '../../widgets/nav_bar.dart';
-import '../../widgets/reksadana_card.dart';
 import '../../theme/theme_provider.dart';
-import '../transaction/topup_screen.dart';
-import '../transaction/beli_screen.dart';
-import '../transaction/jual_screen.dart';
-import '../../utils/user_session.dart'; // Tambahkan ini
+import '../../utils/user_session.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../controllers/chart_data_controller.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-@override
-Widget build(BuildContext context) {
-  final themeProvider = AppTheme(context);
-  final isDark = themeProvider.isDarkMode;
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
   final session = Get.find<UserSession>();
 
-  // Tampilkan userId secara reaktif di console saat nilai berubah
-  session.userId.listen((id) {
-    print('[HomeScreen] User ID from session: $id');
-  });
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = AppTheme(context);
+    final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
@@ -41,72 +41,50 @@ Widget build(BuildContext context) {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Obx(() => Text(
+                'Halo ${session.userName.value.isNotEmpty ? session.userName.value : 'Calon Investor'}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              )),
+          const SizedBox(height: 28),
           Text(
-            'Halo, Investor 👋',
+            'Quick Access',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white70 : Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
             ),
           ),
           const SizedBox(height: 12),
-          // Total Investasi Card
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[850] : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 4),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Investasi Anda',
-                  style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.black),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Rp 12.500.000',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Aksi cepat
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _QuickAction(
-                icon: Icons.add_circle,
-                label: 'Top Up',
+                icon: Icons.show_chart,
+                label: 'Live Chart',
                 isDark: isDark,
-                onTap: () => Get.to(() => const TopUpScreen()),
+                onTap: () => Get.to(() => const ChartScreen()),
               ),
               _QuickAction(
-                icon: Icons.shopping_cart,
-                label: 'Beli',
+                icon: Icons.pie_chart_outline,
+                label: 'Reksadana',
                 isDark: isDark,
-                onTap: () => Get.to(() => const BeliScreen()),
+                onTap: () => Get.toNamed('/edu'),
               ),
               _QuickAction(
-                icon: Icons.trending_down,
-                label: 'Jual',
+                icon: Icons.account_circle_outlined,
+                label: 'Profile',
                 isDark: isDark,
-                onTap: () => Get.to(() => const JualScreen()),
+                onTap: () => Get.toNamed('/profile'),
               ),
             ],
           ),
           const SizedBox(height: 28),
           Text(
-            'Rekomendasi Reksadana',
+            'Kalkulator Investasi',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -114,31 +92,10 @@ Widget build(BuildContext context) {
             ),
           ),
           const SizedBox(height: 12),
-          // Card Horizontal
-          SizedBox(
-            height: 160,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: const [
-                ReksadanaCard(
-                  title: 'Danamas Stabil',
-                  risk: 'Rendah',
-                  returnPercent: 4.25,
-                  amount: 500000,
-                ),
-                SizedBox(width: 12),
-                ReksadanaCard(
-                  title: 'Saham Hebat',
-                  risk: 'Tinggi',
-                  returnPercent: 15.2,
-                  amount: 250000,
-                ),
-              ],
-            ),
-          ),
+          InvestmentCalculator(isDark: isDark),
         ],
       ),
-      bottomNavigationBar: NavBar(currentIndex: 0),
+      bottomNavigationBar: const NavBar(currentIndex: 0),
     );
   }
 }
@@ -161,17 +118,238 @@ class _QuickAction extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CircleAvatar(
-            radius: 26,
-            backgroundColor: isDark ? Colors.grey[700] : Colors.white,
-            child: Icon(icon, color: Colors.blueAccent, size: 30),
+            radius: 28,
+            backgroundColor: isDark ? Colors.grey[800] : Colors.white,
+            child: Icon(icon, size: 28, color: Colors.blueAccent),
           ),
           const SizedBox(height: 6),
           Text(
             label,
-            style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+class InvestmentCalculator extends StatefulWidget {
+  final bool isDark;
+
+  const InvestmentCalculator({super.key, required this.isDark});
+
+  @override
+  State<InvestmentCalculator> createState() => _InvestmentCalculatorState();
+}
+
+class _InvestmentCalculatorState extends State<InvestmentCalculator> {
+  final TextEditingController _monthlyController = TextEditingController(text: '300000');
+  int _selectedYear = 1;
+  double? _result;
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  List<Map<String, dynamic>> _reksadanaList = [];
+  String? _selectedReksadanaId;
+  String? _selectedReksadanaType;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllReksadana();
+  }
+
+  Future<void> _fetchAllReksadana() async {
+    final snapshot = await _db.collection('reksadana_market').get();
+    setState(() {
+      _reksadanaList = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return {
+          'id': doc.id,
+          'name': data['name'],
+          'type': data['type'],
+        };
+      }).toList();
+
+      if (_reksadanaList.isNotEmpty) {
+        final first = _reksadanaList.first;
+        _selectedReksadanaId = first['id'];
+        _selectedReksadanaType = first['type'];
+      }
+    });
+  }
+
+  double getEstimatedReturn(String type, int year) {
+    final Map<String, Map<int, double>> returnTable = {
+      'Pasar Uang': {1: 0.05, 2: 0.06, 3: 0.08, 4: 0.12, 5: 0.13, 6: 0.15, 7: 0.20},
+      'Obligasi':   {1: 0.06, 2: 0.08, 3: 0.10, 4: 0.14, 5: 0.16, 6: 0.18, 7: 0.22},
+      'Saham':      {1: 0.10, 2: 0.15, 3: 0.18, 4: 0.22, 5: 0.28, 6: 0.32, 7: 0.40},
+    };
+
+    return returnTable[type]?[year] ?? 0.05;
+  }
+
+void _calculate() {
+  final monthly = double.tryParse(_monthlyController.text.replaceAll('.', '')) ?? 0;
+  if (monthly == 0 || _selectedReksadanaType == null) {
+    setState(() => _result = null);
+    return;
+  }
+
+  final totalInvest = monthly * 12 * _selectedYear;
+
+  // DEBUG
+  print('>> Selected type: $_selectedReksadanaType');
+  print('>> Selected year: $_selectedYear');
+
+  final returnRate = getEstimatedReturn(_selectedReksadanaType!, _selectedYear);
+  print('>> Return rate: $returnRate');
+
+  final gain = totalInvest * returnRate;
+  setState(() {
+    _result = totalInvest + gain;
+  });
+}
+
+
+  @override
+  Widget build(BuildContext context) {
+    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: widget.isDark ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Nominal per Bulan:', style: TextStyle(color: widget.isDark ? Colors.white : Colors.black)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _monthlyController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: 'Contoh: 300000',
+              filled: true,
+              fillColor: widget.isDark ? Colors.grey[800] : Colors.grey[100],
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onChanged: (Value) {
+              setState(() {
+                _result = null;
+              });
+            }
+          ),
+          const SizedBox(height: 16),
+          Text('Pilih Reksadana:', style: TextStyle(color: widget.isDark ? Colors.white : Colors.black)),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: _selectedReksadanaId,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: widget.isDark ? Colors.grey[800] : Colors.grey[100],
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            items: _reksadanaList.map((rek) {
+              final label = '${rek['type']} - ${rek['name']}';
+              return DropdownMenuItem<String>(
+                value: rek['id'],
+                child: Text(label),
+              );
+            }).toList(),
+            onChanged: (val) {
+              if (val == null) return;
+              final selected = _reksadanaList.firstWhere((rek) => rek['id'] == val, orElse: () => {});
+              setState(() {
+                _selectedReksadanaId = val;
+                _selectedReksadanaType = selected['type'];
+                _result = null;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          Text('Durasi Investasi (tahun):', style: TextStyle(color: widget.isDark ? Colors.white : Colors.black)),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<int>(
+            value: _selectedYear,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: widget.isDark ? Colors.grey[800] : Colors.grey[100],
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            items: List.generate(7, (i) => i + 1).map((year) {
+              return DropdownMenuItem(value: year, child: Text('$year Tahun'));
+            }).toList(),
+            onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                   _selectedYear = val;
+                  _result = null;
+              });
+          }
+        },
+
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _calculate,
+              child: const Text('Hitung Keuntungan'),
+            ),
+          ),
+          if (_result != null) ...[
+            const SizedBox(height: 16),
+            Divider(color: widget.isDark ? Colors.white24 : Colors.grey),
+            const SizedBox(height: 12),
+            Text(
+              'Hasil Perhitungan:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: widget.isDark ? Colors.white : Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Total Investasi:', style: TextStyle(color: widget.isDark ? Colors.white70 : Colors.black87)),
+                Text(
+                  formatter.format(double.parse(_monthlyController.text.replaceAll('.', '')) * 12 * _selectedYear),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Keuntungan Estimasi:', style: TextStyle(color: widget.isDark ? Colors.white70 : Colors.black87)),
+                Text(
+                  formatter.format(_result! - (double.parse(_monthlyController.text.replaceAll('.', '')) * 12 * _selectedYear)),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Total Akhir:', style: TextStyle(color: widget.isDark ? Colors.white70 : Colors.black87)),
+                Text(
+                  formatter.format(_result),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                ),
+              ],
+            ),
+          ]
         ],
       ),
     );
