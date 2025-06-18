@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:growmee/controllers/user_controller.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:growmee/controllers/auth_controller.dart';
-import '../../services/database_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

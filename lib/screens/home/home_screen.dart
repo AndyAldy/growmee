@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:growmee/controllers/auth_controller.dart';
 import '../../widgets/nav_bar.dart';
 import '../../widgets/reksadana_card.dart';
 import '../../theme/theme_provider.dart';
 import '../transaction/topup_screen.dart';
 import '../transaction/beli_screen.dart';
 import '../transaction/jual_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../models/user_model.dart';
 import '../../utils/user_session.dart'; // Tambahkan ini
 
 class HomeScreen extends StatelessWidget {

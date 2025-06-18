@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/auth/login_screen.dart';
 // import semua screen yang perlu
