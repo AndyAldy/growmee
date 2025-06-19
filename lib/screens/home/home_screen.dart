@@ -5,7 +5,6 @@ import 'package:growmee/theme/theme_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/nav_bar.dart';
-import '../../theme/app_theme.dart';
 import '../../utils/user_session.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
