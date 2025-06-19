@@ -44,7 +44,12 @@ dependencies:
   path_provider: ^2.1.5
   http: ^1.4.0
   shared_preferences: ^2.5.3
+  flutter_launcher_icons: ^0.14.4
 dev_dependencies:
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/Icon apk/Logo GrowME.png"
   flutter_test:
     sdk: flutter
 
