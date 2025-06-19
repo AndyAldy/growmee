@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import '../../theme/theme_provider.dart';
+import '../../theme/app_theme.dart';
 import '../../controllers/chart_data_controller.dart';
 
 class ChartScreen extends StatefulWidget {
@@ -103,7 +103,7 @@ class _ChartScreenState extends State<ChartScreen> {
             onChanged: (val) {
               if (val != null) {
                 controller.updateProduct(val);
-                _setupStream(val); // Ganti stream saat produk berubah
+                _setupStream(val);
               }
             },
           )),

@@ -10,7 +10,7 @@ import 'firebase_options.dart';
 import '../../../utils/helpers.dart';
 import '../../utils/user_session.dart';
 import 'controllers/chart_data_controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +27,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserController()),
       ],
       child: GrowME(initialRoute: user != null ? '/home' : '/', userId: user?.uid),
@@ -46,12 +47,13 @@ class GrowME extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return GetMaterialApp(
       title: 'GrowMe',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeProvider.themeMode,
       initialRoute: initialRoute,
       getPages: appPages,
       onGenerateRoute: (settings) {

@@ -6,12 +6,14 @@ class UserModel {
   final String email;
   final String? riskLevel;
   final String? name;
+  final bool fingerprintEnabled; // ✅ Tambahan
 
   UserModel({
     required this.uid,
     required this.email,
     this.riskLevel,
     this.name,
+    this.fingerprintEnabled = false, // ✅ Default false
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map, String uid) {
@@ -20,6 +22,7 @@ class UserModel {
       email: map['email'] ?? '',
       riskLevel: map['riskLevel'],
       name: map['name'],
+      fingerprintEnabled: map['fingerprintEnabled'] ?? false, // ✅ Ambil dari Firestore
     );
   }
 
@@ -28,6 +31,7 @@ class UserModel {
       'email': email,
       'riskLevel': riskLevel,
       'name': name,
+      'fingerprintEnabled': fingerprintEnabled, // ✅ Simpan ke Firestore
     };
   }
 
@@ -36,12 +40,14 @@ class UserModel {
     String? email,
     String? riskLevel,
     String? name,
+    bool? fingerprintEnabled,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
       email: email ?? this.email,
       riskLevel: riskLevel ?? this.riskLevel,
       name: name ?? this.name,
+      fingerprintEnabled: fingerprintEnabled ?? this.fingerprintEnabled,
     );
   }
 
@@ -54,10 +60,11 @@ class UserModel {
       email: data['email'] ?? '',
       riskLevel: data['riskLevel'],
       name: data['name'],
+      fingerprintEnabled: data['fingerprintEnabled'] ?? false, // ✅
     );
   }
 
-  // Tambahan untuk update session
+  // Untuk menyimpan session ke UserSession
   void updateSession(UserSession session) {
     session.setUserId(uid);
     session.setUserName(name ?? '');

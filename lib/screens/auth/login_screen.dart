@@ -49,20 +49,16 @@ class _LoginScreenState extends State<LoginScreen> {
         final userController = Get.find<UserController>();
         final exists = await userController.checkUserExists(userId);
 
-        // Simpan data awal jika belum ada
         if (!exists) {
-          await userController.saveInitialUserData(userId, email, ''); // nama default kosong
+          await userController.saveInitialUserData(userId, email, '');
         }
 
-        // Ambil data user setelah login
         await userController.fetchUserData(userId);
         final name = userController.userModel?.name ?? '';
 
-        // Simpan ke session global
         userSession.setUserId(userId);
         userSession.setUserName(name);
 
-        // Pindah ke Home
         Get.offAllNamed('/home', arguments: {'userId': userId});
       } else {
         setState(() {
@@ -121,6 +117,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<bool> _shouldShowFingerprintButton() async {
+    final userId = authController.userId;
+    if (userId != null) {
+      final userController = Get.find<UserController>();
+      await userController.fetchUserData(userId);
+      return userController.userModel?.fingerprintEnabled ?? false;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,10 +170,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text('Daftar Akun'),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: _loginWithBiometrics,
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text('Login dengan Fingerprint'),
+
+                // ✅ Tampilkan tombol fingerprint hanya jika fingerprint aktif
+                FutureBuilder<bool>(
+                  future: _shouldShowFingerprintButton(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox();
+                    }
+
+                    if (snapshot.data == true) {
+                      return ElevatedButton.icon(
+                        onPressed: _loginWithBiometrics,
+                        icon: const Icon(Icons.fingerprint),
+                        label: const Text('Login dengan Fingerprint'),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
                 ),
               ],
             ),

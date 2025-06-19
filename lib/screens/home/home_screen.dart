@@ -3,10 +3,9 @@ import 'package:get/get.dart';
 import 'package:growmee/screens/portfolio/Chart_screen.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/nav_bar.dart';
-import '../../theme/theme_provider.dart';
+import '../../theme/app_theme.dart';
 import '../../utils/user_session.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../controllers/chart_data_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

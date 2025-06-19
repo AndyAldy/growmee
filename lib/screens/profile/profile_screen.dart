@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:growmee/widgets/nav_bar.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/user_controller.dart';
-import '../../screens/home/home_screen.dart';
-import '../../screens/auth/login_screen.dart';
+import 'package:growmee/controllers/user_controller.dart';
+import 'package:growmee/theme/theme_provider.dart';
 import 'package:growmee/utils/user_session.dart';
+import 'package:growmee/widgets/nav_bar.dart';
+import '../../screens/auth/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,13 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout() {
     final session = Get.find<UserSession>();
-    session.setUserId(''); // Hapus ID session
-    Get.offAll(() => const LoginScreen()); // Arahkan ke login screen
+    session.setUserId('');
+    Get.offAll(() => const LoginScreen());
   }
 
   @override
   Widget build(BuildContext context) {
     final userController = Provider.of<UserController>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final user = userController.userModel;
 
     return Scaffold(
@@ -83,6 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
+
                     ListTile(
                       leading: const Icon(Icons.person_outline),
                       title: const Text('Nama Lengkap'),
@@ -95,11 +97,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subtitle: Text(user.email),
                     ),
                     const Divider(),
+
+                    // ✅ Fingerprint Switch
+                    SwitchListTile(
+                      title: const Text('Aktifkan Login dengan Fingerprint'),
+                      secondary: const Icon(Icons.fingerprint),
+                      value: user.fingerprintEnabled,
+                      onChanged: (value) async {
+                        await userController.updateFingerprintStatus(user.uid, value);
+                        await userController.fetchUserData(user.uid);
+                      },
+                    ),
+                    const Divider(),
+
+                    // ✅ Theme Switch
+                    SwitchListTile(
+                      title: const Text('Tema Gelap'),
+                      secondary: const Icon(Icons.dark_mode),
+                      value: themeProvider.isDarkMode,
+                      onChanged: (value) {
+                        themeProvider.toggleTheme(value);
+                      },
+                    ),
+
                     const Spacer(),
                   ],
                 ),
 
-                // 👇 Logout Button di pojok kanan atas
+                // Logout Button
                 Positioned(
                   top: 40,
                   right: 20,
@@ -111,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            bottomNavigationBar: const NavBar(currentIndex: 3),
+      bottomNavigationBar: const NavBar(currentIndex: 3),
     );
   }
 }
