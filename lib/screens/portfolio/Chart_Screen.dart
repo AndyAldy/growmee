@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:growmee/theme/theme_provider.dart';
 import 'package:growmee/widgets/nav_bar.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
-import '../../theme/app_theme.dart';
+import 'package:provider/provider.dart';
 import '../../controllers/chart_data_controller.dart';
 
 class ChartScreen extends StatefulWidget {
@@ -77,84 +78,111 @@ class _ChartScreenState extends State<ChartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = AppTheme(context).isDarkMode;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        title: Obx(() => Text('Grafik ${controller.selectedProduct.value}')),
-        backgroundColor: isDark ? Colors.grey[900] : Colors.blue,
+        backgroundColor: Colors.blue,
+        title: Obx(() => Text(
+          'Grafik ${controller.selectedProduct.value}',
+          style: TextStyle(color: isDark ? Colors.white : Colors.white),
+        )),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Get.back(),
         ),
       ),
-      body: Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Obx(() => DropdownButtonFormField<String>(
-            value: controller.selectedProduct.value,
-            decoration: const InputDecoration(
-              labelText: 'Pilih Produk',
-              border: OutlineInputBorder(),
-            ),
-            items: ['Reksadana', 'Obligasi', 'Saham']
-                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                .toList(),
-            onChanged: (val) {
-              if (val != null) {
-                controller.updateProduct(val);
-                _setupStream(val);
-              }
-            },
-          )),
-        ),
-        Expanded(
-          child: StreamBuilder<List<FlSpot>>(
-            stream: _stream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || snapshot.data!.length < 2) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final data = snapshot.data!;
-              final minY = data.map((e) => e.y).reduce(min);
-              final maxY = data.map((e) => e.y).reduce(max);
-              final diffY = maxY - minY;
-              final minX = data.first.x;
-              final maxX = data.last.x;
-              final diffX = maxX - minX;
-              final yInt = max(1.0, (diffY / 4).ceilToDouble());
-              final xInt = max(1.0, (diffX / 4).ceilToDouble());
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Obx(() => DropdownButtonFormField<String>(
+              value: controller.selectedProduct.value,
+              decoration: InputDecoration(
+                labelText: 'Pilih Produk',
+                border: const OutlineInputBorder(),
+                labelStyle: TextStyle(color: isDark ? Colors.white : Colors.black),
+              ),
+              dropdownColor: isDark ? Colors.grey[800] : Colors.white,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              iconEnabledColor: isDark ? Colors.white : Colors.black,
+              items: ['Reksadana', 'Obligasi', 'Saham']
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  controller.updateProduct(val);
+                  _setupStream(val);
+                }
+              },
+            )),
+          ),
+          Expanded(
+            child: StreamBuilder<List<FlSpot>>(
+              stream: _stream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data!.length < 2) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: LineChart(
-                  LineChartData(
-                    minY: minY * 0.95,
-                    maxY: maxY * 1.05,
-                    titlesData: FlTitlesData(
-                      bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true, interval: xInt)),
-                      leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true, interval: yInt)),
-                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    ),
-                    gridData: FlGridData(show: true),
-                    borderData: FlBorderData(show: true),
-                    lineBarsData: [
-                      LineChartBarData(
+                final data = snapshot.data!;
+                final minY = data.map((e) => e.y).reduce(min);
+                final maxY = data.map((e) => e.y).reduce(max);
+                final diffY = maxY - minY;
+                final minX = data.first.x;
+                final maxX = data.last.x;
+                final diffX = maxX - minX;
+                final yInt = max(1.0, (diffY / 4).ceilToDouble());
+                final xInt = max(1.0, (diffX / 4).ceilToDouble());
+
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: LineChart(
+                    LineChartData(
+                      minY: minY * 0.95,
+                      maxY: maxY * 1.05,
+                      titlesData: FlTitlesData(
+                        bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: xInt,
+                                getTitlesWidget: (value, meta) => Text(
+                                      '${value.toInt()}',
+                                      style: TextStyle(
+                                          color: isDark ? Colors.white70 : Colors.black),
+                                    ))),
+                        leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: yInt,
+                                getTitlesWidget: (value, meta) => Text(
+                                      '${value.toInt()}',
+                                      style: TextStyle(
+                                          color: isDark ? Colors.white70 : Colors.black),
+                                    ))),
+                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      ),
+                      gridData: FlGridData(show: true),
+                      borderData: FlBorderData(show: true),
+                      lineBarsData: [
+                        LineChartBarData(
                           spots: data,
                           isCurved: true,
                           color: isDark ? Colors.cyanAccent : Colors.blueAccent,
-                          barWidth: 3)
-                    ],
+                          barWidth: 3,
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        )
-      ]),
+                );
+              },
+            ),
+          )
+        ],
+      ),
       bottomNavigationBar: const NavBar(currentIndex: 1),
     );
   }

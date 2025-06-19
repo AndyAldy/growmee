@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _logout() {
     final session = Get.find<UserSession>();
-    session.setUserId('');
+    session.clear();
     Get.offAll(() => const LoginScreen());
   }
 
@@ -98,7 +98,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const Divider(),
 
-                    // ✅ Fingerprint Switch
                     SwitchListTile(
                       title: const Text('Aktifkan Login dengan Fingerprint'),
                       secondary: const Icon(Icons.fingerprint),
@@ -110,7 +109,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const Divider(),
 
-                    // ✅ Theme Switch
                     SwitchListTile(
                       title: const Text('Tema Gelap'),
                       secondary: const Icon(Icons.dark_mode),
@@ -123,8 +121,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Spacer(),
                   ],
                 ),
-
-                // Logout Button
                 Positioned(
                   top: 40,
                   right: 20,

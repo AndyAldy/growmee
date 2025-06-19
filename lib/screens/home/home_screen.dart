@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:growmee/screens/portfolio/Chart_screen.dart';
+import 'package:growmee/theme/theme_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/nav_bar.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/user_session.dart';
@@ -19,20 +21,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = AppTheme(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.black : const Color(0xFFE0F7FA),
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blue,
         elevation: 0,
         title: Text(
           'Investasi',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
-            color: isDark ? Colors.white : Colors.black,
+            color: isDark ? Colors.white : Colors.white,
           ),
         ),
         automaticallyImplyLeading: false,

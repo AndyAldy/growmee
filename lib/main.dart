@@ -18,7 +18,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // ✅ Tambahkan semua controller yang dibutuhkan sebelum runApp
+  await FirebaseAuth.instance.signOut();
   Get.put(UserSession(), permanent: true);
   Get.put(ChartDataController(), permanent: true);
 

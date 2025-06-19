@@ -15,10 +15,10 @@ class NavBar extends StatelessWidget {
         Get.toNamed('/live');
         break;
       case 2:
-        Get.offAllNamed('/edu');
+        Get.toNamed('/edu');
         break;
       case 3:
-        Get.offAllNamed('/profile');
+        Get.toNamed('/profile');
         break;
     }
   }
