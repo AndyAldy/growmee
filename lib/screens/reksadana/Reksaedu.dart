@@ -69,19 +69,27 @@ class _ReksadanaEduScreenState extends State<ReksadanaEduScreen> {
                 'Nilai investasi dapat naik turun tergantung kondisi pasar. Pilihlah jenis reksa dana sesuai profil risiko kamu.',
             isDark: isDark,
           ),
+      const SizedBox(height: 16),
+        _EduLinkCard(
+            title: 'Edukasi tentang Logam mulia emas',
+            isDark: isDark,
+            links: {
+              'OJK - Investasi Logam Mulia': 'https://sikapiuangmu.ojk.go.id/FrontEnd/CMS/Category/85',
+            },
+            launchURL: _launchURL,
+          ),
           const SizedBox(height: 16),
-          
-          // 3. Card baru untuk link edukasi eksternal
           _EduLinkCard(
             title: 'Baca Selengkapnya',
             isDark: isDark,
             links: {
-              'OJK - Otoritas Jasa Keuangan': 'https://sikapiuangmu.ojk.go.id/FrontEnd/CMS/Category/34',
+              'OJK - ReksaDana': 'https://sikapiuangmu.ojk.go.id/FrontEnd/CMS/Category/70',
+              'OJK - ReksaDana Terbuka': 'https://sikapiuangmu.ojk.go.id/FrontEnd/CMS/Category/71',
               'IDX - Bursa Efek Indonesia': 'https://www.idx.co.id/id/produk/reksa-dana',
-              'CNBC Indonesia - Panduan Pemula': 'https://www.cnbcindonesia.com/investment/20231109151528-23-487779/panduan-lengkap-investasi-reksa-dana-untuk-pemula',
-              'Bibit - Blog Edukasi': 'https://blog.bibit.id/belajar-investasi/reksadana-adalah',
+              'CNBC Indonesia - Panduan Pemula': 'https://www.cnbcindonesia.com/market',
+              'Bibit - Blog Edukasi': 'https://blog.bibit.id/education',
             },
-            launchURL: _launchURL, // Mengoper fungsi _launchURL
+            launchURL: _launchURL,
           ),
         ],
       ),
@@ -140,7 +148,6 @@ class _EduCard extends StatelessWidget {
   }
 }
 
-// 4. Widget baru yang dibuat khusus untuk menampilkan link
 class _EduLinkCard extends StatelessWidget {
   final String title;
   final bool isDark;
