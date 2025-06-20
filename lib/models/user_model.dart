@@ -68,5 +68,6 @@ class UserModel {
   void updateSession(UserSession session) {
     session.setUserId(uid);
     session.setUserName(name ?? '');
+    session.setFingerprintEnabled(fingerprintEnabled);
   }
 }
