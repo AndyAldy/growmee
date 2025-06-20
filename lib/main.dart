@@ -18,7 +18,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await FirebaseAuth.instance.signOut();
   Get.put(UserSession(), permanent: true);
   Get.put(ChartDataController(), permanent: true);
 
@@ -30,7 +29,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserController()),
       ],
-      child: GrowME(initialRoute: user != null ? '/home' : '/', userId: user?.uid),
+      child: GrowME(initialRoute: user != null ? '/' : '/', userId: user?.uid),
     ),
   );
 }

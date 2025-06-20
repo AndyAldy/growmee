@@ -36,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (password != confirmPassword) {
-      setState(() => _error = 'Password dan konfirmasi tidak cocok');
+      setState(() => _error = 'Password dan Password Konfirmasi tidak cocok');
       return;
     }
 
@@ -56,14 +56,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         userSession.setUserId(userId);
         userSession.setUserName(name);
 
-        Get.offAllNamed('/home', arguments: {'userId': userId});
+        Get.offAllNamed('/', arguments: {'userId': userId});
       } else {
         setState(() => _error = 'Pendaftaran gagal: user ID tidak ditemukan');
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _error = e.message ?? 'Terjadi kesalahan');
     } catch (e) {
-      setState(() => _error = 'Error: $e');
+      setState(() => _error = 'Error: Kesalahan Sistem');
     } finally {
       setState(() => _isLoading = false);
     }
