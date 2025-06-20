@@ -17,7 +17,6 @@ class UserController extends ChangeNotifier {
     return doc.exists;
   }
 
-  // ✅ Fungsi untuk menyimpan data awal user ke Firestore
   Future<void> saveInitialUserData(String userId, String email, String name) async {
     try {
       final userDoc = _db.collection('users').doc(userId);
@@ -26,7 +25,7 @@ class UserController extends ChangeNotifier {
         'email': email,
         'name': name,
         'riskLevel': null,
-        'fingerprintEnabled': false, // ✅ default false saat awal
+        'fingerprintEnabled': false,
       }, SetOptions(merge: true));
 
       _userModel = UserModel(
@@ -43,7 +42,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // ✅ Fungsi untuk mengambil data user dari Firestore
   Future<void> fetchUserData(String userId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
@@ -57,10 +55,9 @@ class UserController extends ChangeNotifier {
           email: data['email'] ?? '',
           name: data['name'] ?? '',
           riskLevel: data['riskLevel'],
-          fingerprintEnabled: data['fingerprintEnabled'] ?? false, // ✅ ambil data fingerprint
+          fingerprintEnabled: data['fingerprintEnabled'] ?? false,
         );
 
-        // Set ke session global
         final session = Get.find<UserSession>();
         session.setUserId(uid);
         session.setUserName(_userModel!.name ?? '');
@@ -72,7 +69,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // ✅ Fungsi untuk update level risiko user
   void updateRiskLevel(String val) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
@@ -87,7 +83,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // ✅ Fungsi untuk mengaktifkan / menonaktifkan login fingerprint
   Future<void> updateFingerprintStatus(String userId, bool isEnabled) async {
     try {
       await _db.collection('users').doc(userId).update({

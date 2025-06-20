@@ -5,23 +5,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserSession extends GetxController {
   final _storage = GetStorage();
 
-  // Kunci untuk local storage
   static const _userIdKey = 'userId';
   static const _userNameKey = 'userName';
-  static const _fingerprintEnabledKey = 'fingerprintEnabled'; // <-- TAMBAHKAN KUNCI BARU
+  static const _fingerprintEnabledKey = 'fingerprintEnabled';
 
-  // Properti reaktif
   final userId = ''.obs;
   final userName = ''.obs;
-  final isFingerprintEnabled = false.obs; // <-- TAMBAHKAN PROPERTI REAKTIF BARU
+  final isFingerprintEnabled = false.obs;
 
   UserSession() {
-    // Load dari local storage saat inisialisasi
     userId.value = _storage.read(_userIdKey) ?? '';
     userName.value = _storage.read(_userNameKey) ?? '';
-    isFingerprintEnabled.value = _storage.read(_fingerprintEnabledKey) ?? false; // <-- MUAT STATUS FINGERPRINT
-
-    // Jika ada user ID saat pertama kali buka, muat datanya dari Firestore
+    isFingerprintEnabled.value = _storage.read(_fingerprintEnabledKey) ?? false;
     if (userId.value.isNotEmpty) {
       loadUserData(userId.value);
     }
@@ -30,7 +25,6 @@ class UserSession extends GetxController {
   void setUserId(String id) {
     userId.value = id;
     _storage.write(_userIdKey, id);
-    // Secara otomatis memuat data user (termasuk nama & status fingerprint) saat ID di-set
     if (id.isNotEmpty) {
       loadUserData(id);
     }
@@ -41,26 +35,24 @@ class UserSession extends GetxController {
     _storage.write(_userNameKey, name);
   }
 
-  // Method ini bisa dipanggil dari halaman setting jika user mengubah preferensi fingerprint
   void setFingerprintEnabled(bool isEnabled) {
     isFingerprintEnabled.value = isEnabled;
     _storage.write(_fingerprintEnabledKey, isEnabled);
   }
 
   Future<void> loadUserData(String uid) async {
-    if (uid.isEmpty) return; // Jangan lakukan apa-apa jika uid kosong
+    if (uid.isEmpty) return;
     try {
       final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
       if (doc.exists) {
         final data = doc.data();
         final name = data?['name'] ?? '';
-        final fingerprintStatus = data?['fingerprintEnabled'] ?? false; // <-- AMBIL STATUS FINGERPRINT DARI FIRESTORE
+        final fingerprintStatus = data?['fingerprintEnabled'] ?? false;
 
-        // Update properti reaktif dan simpan ke local storage
         userName.value = name;
         isFingerprintEnabled.value = fingerprintStatus;
         _storage.write(_userNameKey, name);
-        _storage.write(_fingerprintEnabledKey, fingerprintStatus); // <-- SIMPAN STATUS FINGERPRINT
+        _storage.write(_fingerprintEnabledKey, fingerprintStatus);
 
         print('[DEBUG] Nama pengguna dimuat: $name');
         print('[DEBUG] Status Fingerprint: $fingerprintStatus');
@@ -86,11 +78,10 @@ class UserSession extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Listener ini bagus untuk debugging, tidak perlu diubah
     ever(userId, (String value) {
       print('[DEBUG] User ID berubah menjadi: $value');
       if (value.isEmpty) {
-        clear(); // Pastikan semua data bersih jika user ID menjadi kosong
+        clear();
       }
     });
   }

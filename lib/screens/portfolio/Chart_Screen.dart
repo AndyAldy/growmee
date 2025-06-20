@@ -39,7 +39,7 @@ class _ChartScreenState extends State<ChartScreen> {
       final price = await _fetchPrice(type);
       if (price > 0) {
         x++;
-        controller.updatePrice(price); // update harga
+        controller.updatePrice(price);
         buffer.add(FlSpot(x.toDouble(), price));
         if (buffer.length > 30) buffer.removeAt(0);
         yield List.from(buffer);

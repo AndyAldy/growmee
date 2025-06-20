@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/auth/login_screen.dart';
-// import semua screen yang perlu
 
 Widget routeSettingsToWidget(String? name, dynamic args) {
   switch (name) {
@@ -9,12 +8,9 @@ Widget routeSettingsToWidget(String? name, dynamic args) {
       return const LoginScreen();
 
     case '/home':
-      return const HomeScreen(); // Tidak perlu userId
+      return const HomeScreen();
 
-    // Tambahkan case lain kalau perlu
-    // case '/portfolio': return const PortfolioScreen();
-    
     default:
-      return const LoginScreen(); // fallback
+      return const LoginScreen();
   }
 }

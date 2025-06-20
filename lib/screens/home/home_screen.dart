@@ -202,7 +202,6 @@ void _calculate() {
 
   final totalInvest = monthly * 12 * _selectedYear;
 
-  // DEBUG
   print('>> Selected type: $_selectedReksadanaType');
   print('>> Selected year: $_selectedYear');
 

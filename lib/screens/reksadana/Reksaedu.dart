@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart'; // <-- 1. Import package
+import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/nav_bar.dart';
 
 class ReksadanaEduScreen extends StatefulWidget {
@@ -12,11 +12,9 @@ class ReksadanaEduScreen extends StatefulWidget {
 }
 
 class _ReksadanaEduScreenState extends State<ReksadanaEduScreen> {
-  // 2. Buat fungsi untuk membuka URL
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      // Jika gagal, bisa tampilkan snackbar atau pesan error
       Get.snackbar('Error', 'Tidak dapat membuka link: $url');
     }
   }
@@ -30,10 +28,9 @@ class _ReksadanaEduScreenState extends State<ReksadanaEduScreen> {
         backgroundColor: Colors.blue,
         title: Text(
           'Edukasi Reksa Dana',
-          style: TextStyle(color: Colors.white), // Disederhanakan, karena background biru, teks selalu putih
+          style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
-          // 5. Warna icon disamakan agar konsisten
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Get.back(),
         ),
@@ -187,7 +184,6 @@ class _EduLinkCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Membuat list link dari Map
           ...links.entries.map((entry) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
