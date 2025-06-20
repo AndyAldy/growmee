@@ -17,18 +17,11 @@ class UserController extends ChangeNotifier {
     return doc.exists;
   }
 
-  // ✅ Fungsi untuk menyimpan data awal user ke Firestore
   Future<void> saveInitialUserData(String userId, String email, String name) async {
     try {
       final userDoc = _db.collection('users').doc(userId);
 
-      await userDoc.set({
-        'email': email,
-        'name': name,
-        'riskLevel': null,
-        'fingerprintEnabled': false, // ✅ default false saat awal
-      }, SetOptions(merge: true));
-
+      // Buat instance UserModel terlebih dahulu
       _userModel = UserModel(
         uid: userId,
         email: email,
@@ -37,33 +30,30 @@ class UserController extends ChangeNotifier {
         fingerprintEnabled: false,
       );
 
+      // Gunakan toMap() dari model untuk konsistensi
+      await userDoc.set(_userModel!.toMap(), SetOptions(merge: true));
+
       notifyListeners();
     } catch (e) {
       print('Error saving user data: $e');
     }
   }
 
-  // ✅ Fungsi untuk mengambil data user dari Firestore
   Future<void> fetchUserData(String userId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+    // Menggunakan userId dari parameter agar lebih fleksibel, tapi bisa juga pakai _auth.currentUser
+    if (userId.isEmpty) return;
 
     try {
-      final doc = await _db.collection('users').doc(uid).get();
+      final doc = await _db.collection('users').doc(userId).get();
       if (doc.exists) {
-        final data = doc.data()!;
-        _userModel = UserModel(
-          uid: uid,
-          email: data['email'] ?? '',
-          name: data['name'] ?? '',
-          riskLevel: data['riskLevel'],
-          fingerprintEnabled: data['fingerprintEnabled'] ?? false, // ✅ ambil data fingerprint
-        );
-
-        // Set ke session global
-        final session = Get.find<UserSession>();
-        session.setUserId(uid);
-        session.setUserName(_userModel!.name ?? '');
+        // Gunakan factory constructor dari UserModel
+        _userModel = UserModel.fromDocument(doc);
+        
+        // ✅ SINKRONISASI DENGAN USER_SESSION (LEBIH BAIK)
+        if (_userModel != null) {
+          final session = Get.find<UserSession>();
+          _userModel!.updateSession(session); // Memanggil method dari model
+        }
 
         notifyListeners();
       }
@@ -72,14 +62,11 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // ✅ Fungsi untuk update level risiko user
   void updateRiskLevel(String val) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
-
     try {
       await _db.collection('users').doc(uid).update({'riskLevel': val});
-
       _userModel = _userModel?.copyWith(riskLevel: val);
       notifyListeners();
     } catch (e) {
@@ -87,20 +74,27 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // ✅ Fungsi untuk mengaktifkan / menonaktifkan login fingerprint
-  Future<void> updateFingerprintStatus(String userId, bool isEnabled) async {
-    try {
-      await _db.collection('users').doc(userId).update({
-        'fingerprintEnabled': isEnabled,
-      });
+Future<void> updateFingerprintStatus(bool isEnabled) async {
+  final userId = _auth.currentUser?.uid;
+  if (userId == null) return;
 
-      if (_userModel != null && _userModel!.uid == userId) {
-        _userModel = _userModel!.copyWith(fingerprintEnabled: isEnabled);
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Error updating fingerprint status: $e');
+  try {
+    await _db.collection('users').doc(userId).update({
+      'fingerprintEnabled': isEnabled,
+    });
+
+    if (_userModel != null) {
+      _userModel = _userModel!.copyWith(fingerprintEnabled: isEnabled);
     }
+
+    final session = Get.find<UserSession>();
+    session.setFingerprintEnabled(isEnabled);
+
+    notifyListeners();
+    Get.snackbar('Sukses', 'Pengaturan fingerprint berhasil diperbarui.');
+
+  } catch (e) {
+    print('Error updating fingerprint status: $e');
   }
-  
+}
 }

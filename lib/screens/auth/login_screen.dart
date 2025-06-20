@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:growmee/controllers/auth_controller.dart';
-import 'package:growmee/controllers/user_controller.dart';
 import 'package:growmee/utils/user_session.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,8 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   final LocalAuthentication auth = LocalAuthentication();
-  final AuthController authController = Get.put(AuthController());
-  late final UserSession userSession;
+  // Tidak perlu instance AuthController di sini jika login manual ditangani di controllernya sendiri
+  // Cukup panggil melalui Get.find() jika dibutuhkan
+
+  // Dapatkan instance UserSession yang sudah ada
+  final UserSession userSession = Get.find<UserSession>();
 
   bool _isLoading = false;
   String? _error;
@@ -26,8 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    Get.put(UserController());
-    userSession = Get.put(UserSession(), permanent: true);
+    // Tidak perlu Get.put() lagi di sini jika sudah di-inject di main.dart atau di route
   }
 
   Future<void> _login() async {
@@ -37,61 +38,40 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
+      final authController = Get.find<AuthController>();
       await authController.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
 
       final userId = authController.userId;
-      final email = _emailController.text.trim();
-
       if (userId != null) {
-        final userController = Get.find<UserController>();
-        final exists = await userController.checkUserExists(userId);
-
-        if (!exists) {
-          await userController.saveInitialUserData(userId, email, '');
-        }
-
-        await userController.fetchUserData(userId);
-        final name = userController.userModel?.name ?? '';
-
+        // Cukup set userId di session, sisanya akan diurus oleh UserSession
         userSession.setUserId(userId);
-        userSession.setUserName(name);
-
-        Get.offAllNamed('/home', arguments: {'userId': userId});
+        Get.offAllNamed('/home');
       } else {
-        setState(() {
-          _error = 'Login gagal: ID pengguna tidak ditemukan.';
-        });
+        throw Exception('ID pengguna tidak ditemukan.');
       }
     } catch (e) {
       setState(() {
-        _error = 'Login gagal: $e';
+        _error = 'Login gagal: ${e.toString()}';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _loginWithBiometrics() async {
     bool isAuthenticated = false;
-
     try {
-      bool canCheckBiometrics = await auth.canCheckBiometrics;
-      bool isDeviceSupported = await auth.isDeviceSupported();
-
-      if (canCheckBiometrics && isDeviceSupported) {
-        isAuthenticated = await auth.authenticate(
-          localizedReason: 'Gunakan biometrik untuk login',
-          options: const AuthenticationOptions(
-            biometricOnly: true,
-            stickyAuth: true,
-          ),
-        );
-      }
+      isAuthenticated = await auth.authenticate(
+        localizedReason: 'Gunakan biometrik untuk login',
+        options: const AuthenticationOptions(biometricOnly: true, stickyAuth: true),
+      );
     } catch (e) {
       setState(() {
         _error = 'Autentikasi biometrik gagal: $e';
@@ -99,32 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (isAuthenticated) {
-      final userId = authController.userId;
-      if (userId != null) {
-        final userController = Get.find<UserController>();
-        await userController.fetchUserData(userId);
-        final name = userController.userModel?.name ?? '';
-
-        userSession.setUserId(userId);
-        userSession.setUserName(name);
-
-        Get.offAllNamed('/home', arguments: {'userId': userId});
-      } else {
-        setState(() {
-          _error = 'Silakan login manual terlebih dahulu untuk mengaktifkan fingerprint.';
-        });
-      }
+      // Jika berhasil, langsung navigasi. UserSession sudah berisi data yang benar.
+      Get.offAllNamed('/home');
     }
-  }
-
-  Future<bool> _shouldShowFingerprintButton() async {
-    final userId = authController.userId;
-    if (userId != null) {
-      final userController = Get.find<UserController>();
-      await userController.fetchUserData(userId);
-      return userController.userModel?.fingerprintEnabled ?? false;
-    }
-    return false;
   }
 
   @override
@@ -135,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
                   'Welcome to GrowME',
@@ -156,6 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _error!,
                     style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
                   ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -171,25 +130,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // ✅ Tampilkan tombol fingerprint hanya jika fingerprint aktif
-                FutureBuilder<bool>(
-                  future: _shouldShowFingerprintButton(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox();
-                    }
-
-                    if (snapshot.data == true) {
-                      return ElevatedButton.icon(
-                        onPressed: _loginWithBiometrics,
-                        icon: const Icon(Icons.fingerprint),
-                        label: const Text('Login dengan Fingerprint'),
-                      );
-                    } else {
-                      return const SizedBox();
-                    }
-                  },
-                ),
+                Obx(() {
+                  if (userSession.userId.isNotEmpty && userSession.isFingerprintEnabled.value) {
+                    return ElevatedButton.icon(
+                      onPressed: _loginWithBiometrics,
+                      icon: const Icon(Icons.fingerprint),
+                      label: const Text('Login dengan Fingerprint'),
+                    );
+                  } else {
+                    return const SizedBox.shrink(); // Widget kosong
+                  }
+                }),
               ],
             ),
           ),
