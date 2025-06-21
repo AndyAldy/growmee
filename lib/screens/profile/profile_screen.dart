@@ -21,14 +21,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Future.microtask(() {
       final session = Get.find<UserSession>();
       final userId = session.userId.value;
-      Provider.of<UserController>(context, listen: false).fetchUserData(userId);
+      if (userId.isNotEmpty) {
+        Provider.of<UserController>(context, listen: false).fetchUserData(userId);
+      }
     });
   }
 
   void _logout() {
     final session = Get.find<UserSession>();
+    final userId = session.userId.value; // Ambil userId SEBELUM session di-clear
     session.clear();
-    Get.offAll(() => const LoginScreen());
+    // Kirim userId ke LoginScreen saat navigasi
+    Get.offAll(() => const LoginScreen(), arguments: {'userId': userId});
   }
 
   @override
@@ -61,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           const SizedBox(height: 12),
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 45,
                             backgroundColor: Colors.white,
                             child: Icon(Icons.person, size: 50, color: Colors.blueAccent),
@@ -84,7 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
                     ListTile(
                       leading: const Icon(Icons.person_outline),
                       title: const Text('Nama Lengkap'),
@@ -97,7 +100,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subtitle: Text(user.email),
                     ),
                     const Divider(),
-
                     SwitchListTile(
                       title: const Text('Aktifkan Login dengan Fingerprint'),
                       secondary: const Icon(Icons.fingerprint),
@@ -108,16 +110,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                     const Divider(),
-
                     SwitchListTile(
                       title: const Text('Tema Gelap'),
                       secondary: const Icon(Icons.dark_mode),
                       value: themeProvider.isDarkMode,
-                      onChanged: (value) {
+                      onChanged: (value) async{
                         themeProvider.toggleTheme(value);
+                        await userController.fetchUserData(user.uid);
                       },
                     ),
-
                     const Spacer(),
                   ],
                 ),
