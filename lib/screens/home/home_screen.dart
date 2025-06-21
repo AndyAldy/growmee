@@ -234,7 +234,7 @@ void _calculate() {
             controller: _monthlyController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              hintText: 'Contoh: 300000',
+              hintText: '10000',
               filled: true,
               fillColor: widget.isDark ? Colors.grey[800] : Colors.grey[100],
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
