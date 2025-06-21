@@ -45,3 +45,4 @@ app.*.map.json
 /android/app/release
 
 .vscode/templates
+assets/Icon_apk/Logo GrowME.png
