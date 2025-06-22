@@ -56,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         userSession.setUserId(userId);
         userSession.setUserName(name);
 
-        Get.offAllNamed('/', arguments: {'userId': userId});
+        Get.offAllNamed('/home', arguments: {'userId': userId});
       } else {
         setState(() => _error = 'Pendaftaran gagal: user ID tidak ditemukan');
       }
