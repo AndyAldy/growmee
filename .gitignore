@@ -46,3 +46,4 @@ app.*.map.json
 
 .vscode/templates
 assets/Icon_apk/Logo GrowME.png
+.env

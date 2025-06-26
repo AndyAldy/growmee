@@ -47,12 +47,17 @@ dependencies:
   url_launcher: ^6.3.1
   shared_preferences: ^2.5.3
   flutter_launcher_icons: ^0.14.4
+  google_generative_ai: ^0.4.7
+  flutter_dotenv: ^5.2.1
+  flutter_markdown: ^0.7.7+1
+  uuid: ^4.5.1
 dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/Icon apk/Logo GrowME.png"
   min_sdk_android: 21
+  
   flutter_test:
     sdk: flutter
 
@@ -75,7 +80,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+  - .env
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

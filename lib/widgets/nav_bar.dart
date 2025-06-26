@@ -7,15 +7,19 @@ class NavBar extends StatelessWidget {
   const NavBar({super.key, required this.currentIndex});
 
   void _onTap(int index) {
+    // Hindari navigasi ke halaman yang sama
+    if (index == currentIndex) return; 
+
     switch (index) {
       case 0:
-        Get.offAllNamed('/home');
+        // Gunakan Get.toNamed agar tidak menghapus state
+        Get.toNamed('/home');
         break;
       case 1:
         Get.toNamed('/live');
         break;
       case 2:
-        Get.toNamed('/edu');
+        Get.toNamed('/ai');
         break;
       case 3:
         Get.toNamed('/profile');
@@ -35,7 +39,7 @@ class NavBar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
         BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Live Chart'),
-        BottomNavigationBarItem(icon: Icon(Icons.pie_chart), label: 'Edukasi ReksaDana'),
+        BottomNavigationBarItem(icon: Icon(Icons.support_agent), label: 'Tanya AI'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],
     );

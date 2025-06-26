@@ -12,12 +12,13 @@ import 'package:growmee/utils/user_session.dart';
 import 'package:growmee/controllers/chart_data_controller.dart';
 import 'package:growmee/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Pastikan binding framework siap sebelum menjalankan kode async
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
-  // Inisialisasi Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -40,9 +41,6 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserController()),
       ],
-      // Logika initialRoute Anda sudah benar, namun bisa disederhanakan
-      // karena `user != null ? '/' : '/'` akan selalu menghasilkan '/'.
-      // Saya akan membiarkannya sesuai kode asli Anda.
       child: GrowME(initialRoute: user != null ? '/' : '/', userId: user?.uid),
     ),
   );
@@ -60,8 +58,6 @@ class GrowME extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Gunakan Consumer untuk praktik terbaik agar hanya widget ini yang di-rebuild
-    // saat tema berubah, bukan seluruh MultiProvider.
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return GetMaterialApp(
