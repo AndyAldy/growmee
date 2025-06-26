@@ -1,8 +1,17 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
+}
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -30,23 +39,28 @@ android {
 
     dependencies {
     implementation("androidx.fragment:fragment:1.6.1")
-  // Import the Firebase BoM
-  implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
-  // TODO: Add the dependencies for Firebase products you want to use
-  // When using the BoM, don't specify versions in Firebase dependencies
-  implementation("com.google.firebase:firebase-analytics")
-
-
-  // Add the dependencies for any other desired Firebase products
-  // https://firebase.google.com/docs/android/setup#available-libraries
-    }
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    
+    signingConfigs {
+        // Gunakan create("release") untuk membuat konfigurasi baru di KTS
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                // Gunakan '=' untuk assignment dan getProperty("...") untuk mengambil nilai
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
         }
     }
+
+    buildTypes {
+        // Gunakan getByName("release") untuk mengkonfigurasi build type yang sudah ada
+        getByName("release") {
+            // Mengatur agar build type 'release' menggunakan konfigurasi 'release' yang telah dibuat di atas.
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
 }
 
 flutter {
