@@ -3,7 +3,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/portfolio/Chart_screen.dart';
-import 'screens/reksadana/chatai.dart';
+import 'screens/reksadana/joko_ai.dart';
 import 'screens/profile/profile_screen.dart';
 
 final List<GetPage> appPages = [

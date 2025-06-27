@@ -30,7 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // Menambahkan pesan sapaan awal dari AI
     _messages.add(ChatMessage(
       id: _uuid.v4(),
-      text: 'Halo! Saya Angel, asisten AI Anda. Tanyakan apa saja seputar investasi atau reksa dana.',
+      text: 'Halo! Saya Joko, asisten AI Anda. Tanyakan apa saja seputar investasi atau reksa dana.',
       isFromUser: false,
     ));
   }
