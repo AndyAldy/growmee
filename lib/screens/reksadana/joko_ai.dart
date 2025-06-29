@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../models/chat_message.dart';
 import '../../services/gemini_service.dart';
 import '../../widgets/message_bubble.dart';
