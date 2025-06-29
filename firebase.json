@@ -3,14 +3,14 @@
     "platforms": {
       "android": {
         "default": {
-          "projectId": "growme-91008",
+          "projectId": "growme-3e411",
           "appId": "1:1062899694013:android:94945b1c4297669f35bad4",
           "fileOutput": "android/app/google-services.json"
         }
       },
       "dart": {
         "lib/firebase_options.dart": {
-          "projectId": "growme-91008",
+          "projectId": "growme-3e411",
           "configurations": {
             "android": "1:1062899694013:android:94945b1c4297669f35bad4",
             "ios": "1:1062899694013:ios:cd92fe7eb238f42335bad4",

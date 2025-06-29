@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "1062899694013",
-    "project_id": "growme-91008",
-    "storage_bucket": "growme-91008.firebasestorage.app"
+    "project_number": "465933799387",
+    "project_id": "growme-3e411",
+    "storage_bucket": "growme-3e411.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1062899694013:android:94945b1c4297669f35bad4",
+        "mobilesdk_app_id": "1:465933799387:android:d273e8b35dd0e64ec961fe",
         "android_client_info": {
-          "package_name": "com.growME"
+          "package_name": "com.GrowME"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1062899694013-cao6b6l0kananua4e81ssd83k80e7cfa.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAqWDP4GHJPtubGWFuNZ-B-9kNFPKjUqT4"
+          "current_key": "AIzaSyATJY3GBl3Ne3lZfKnCnJkFHJJnMi_iIIo"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1062899694013-cao6b6l0kananua4e81ssd83k80e7cfa.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "1062899694013-oq391bjcpi02gcdfu0lvr59q1prhlh1g.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.growmee"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
