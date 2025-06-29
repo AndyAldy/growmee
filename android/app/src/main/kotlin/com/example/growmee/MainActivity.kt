@@ -1,4 +1,4 @@
-package com.growME
+package com.GrowME
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
