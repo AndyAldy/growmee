@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
+import 'package:intl/intl.dart'; 
 import 'package:provider/provider.dart';
 import '../../controllers/chart_data_controller.dart';
 
@@ -28,7 +29,12 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 
   void _setupStream(String type) {
-    _stream = _priceStream(type);
+    // ---- PERUBAHAN UTAMA ADA DI SINI ----
+    // Kita panggil setState untuk memberitahu Flutter agar membangun ulang widget
+    // dengan stream yang baru.
+    setState(() {
+      _stream = _priceStream(type);
+    });
   }
 
   Stream<List<FlSpot>> _priceStream(String type) async* {
@@ -51,20 +57,24 @@ class _ChartScreenState extends State<ChartScreen> {
   Future<double> _fetchPrice(String type) async {
     try {
       if (type == 'Reksadana') {
-        final uri = Uri.parse('https://arima-reksadana-api.vercel.app/api?rd=RD13&days=1');
+        final uri = Uri.parse(
+            'https://arima-reksadana-api.vercel.app/api?rd=RD13&days=1');
         final res = await http.get(uri).timeout(const Duration(seconds: 3));
         final d = jsonDecode(res.body);
         final price = (d['data'].last['close'] as num).toDouble();
         controller.updateReturnRate(0.08);
         return price;
       } else if (type == 'Saham') {
-        final res = await http.get(Uri.parse('https://api.goapi.io/quotes?symbol=BBCA'))
+        final res = await http
+            .get(Uri.parse('https://api.goapi.io/quotes?symbol=BBCA'))
             .timeout(const Duration(seconds: 3));
         final data = jsonDecode(res.body);
         controller.updateReturnRate(0.12);
         return (data['price'] as num).toDouble();
       } else if (type == 'Obligasi') {
-        final res = await http.get(Uri.parse('https://api.tradingeconomics.com/historical/country/indonesia/government-bond-yield?&c=API_KEY'))
+        final res = await http
+            .get(Uri.parse(
+                'https://api.tradingeconomics.com/historical/country/indonesia/government-bond-yield?&c=API_KEY'))
             .timeout(const Duration(seconds: 3));
         final data = jsonDecode(res.body);
         controller.updateReturnRate(0.06);
@@ -86,9 +96,9 @@ class _ChartScreenState extends State<ChartScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Obx(() => Text(
-          'Grafik ${controller.selectedProduct.value}',
-          style: TextStyle(color: isDark ? Colors.white : Colors.white),
-        )),
+              'Grafik ${controller.selectedProduct.value}',
+              style: TextStyle(color: isDark ? Colors.white : Colors.white),
+            )),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Get.back(),
@@ -99,25 +109,27 @@ class _ChartScreenState extends State<ChartScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Obx(() => DropdownButtonFormField<String>(
-              value: controller.selectedProduct.value,
-              decoration: InputDecoration(
-                labelText: 'Pilih Produk',
-                border: const OutlineInputBorder(),
-                labelStyle: TextStyle(color: isDark ? Colors.white : Colors.black),
-              ),
-              dropdownColor: isDark ? Colors.grey[800] : Colors.white,
-              style: TextStyle(color: isDark ? Colors.white : Colors.black),
-              iconEnabledColor: isDark ? Colors.white : Colors.black,
-              items: ['Reksadana', 'Obligasi', 'Saham']
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  controller.updateProduct(val);
-                  _setupStream(val);
-                }
-              },
-            )),
+                  value: controller.selectedProduct.value,
+                  decoration: InputDecoration(
+                    labelText: 'Pilih Produk',
+                    border: const OutlineInputBorder(),
+                    labelStyle:
+                        TextStyle(color: isDark ? Colors.white : Colors.black),
+                  ),
+                  dropdownColor: isDark ? Colors.grey[800] : Colors.white,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  iconEnabledColor: isDark ? Colors.white : Colors.black,
+                  items: ['Reksadana', 'Obligasi', 'Saham']
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      // Cukup panggil updateProduct. _setupStream akan dipanggil dari setState.
+                      controller.updateProduct(val); 
+                      _setupStream(val);
+                    }
+                  },
+                )),
           ),
           Expanded(
             child: StreamBuilder<List<FlSpot>>(
@@ -130,49 +142,73 @@ class _ChartScreenState extends State<ChartScreen> {
                 final data = snapshot.data!;
                 final minY = data.map((e) => e.y).reduce(min);
                 final maxY = data.map((e) => e.y).reduce(max);
-                final diffY = maxY - minY;
-                final minX = data.first.x;
-                final maxX = data.last.x;
-                final diffX = maxX - minX;
-                final yInt = max(1.0, (diffY / 4).ceilToDouble());
-                final xInt = max(1.0, (diffX / 4).ceilToDouble());
 
                 return Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   child: LineChart(
                     LineChartData(
-                      minY: minY * 0.95,
-                      maxY: maxY * 1.05,
+                      minY: minY * 0.98,
+                      maxY: maxY * 1.02,
                       titlesData: FlTitlesData(
                         bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                                showTitles: true,
-                                interval: xInt,
-                                getTitlesWidget: (value, meta) => Text(
-                                      '${value.toInt()}',
-                                      style: TextStyle(
-                                          color: isDark ? Colors.white70 : Colors.black),
-                                    ))),
+                            sideTitles: SideTitles(showTitles: false)),
                         leftTitles: AxisTitles(
                             sideTitles: SideTitles(
-                                showTitles: true,
-                                interval: yInt,
-                                getTitlesWidget: (value, meta) => Text(
-                                      '${value.toInt()}',
-                                      style: TextStyle(
-                                          color: isDark ? Colors.white70 : Colors.black),
-                                    ))),
+                          showTitles: true,
+                          reservedSize: 50, 
+                          getTitlesWidget: (value, meta) {
+                            if (value == meta.max || value == meta.min) {
+                              return const SizedBox();
+                            }
+                            
+                            final formatter = NumberFormat.compactSimpleCurrency(locale: 'id_ID');
+
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                formatter.format(value),
+                                style: TextStyle(
+                                  color: isDark ? Colors.white70 : Colors.black,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            );
+                          },
+                        )),
                         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                         rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       ),
-                      gridData: FlGridData(show: true),
-                      borderData: FlBorderData(show: true),
+                      gridData: FlGridData(
+                        show: true,
+                        getDrawingHorizontalLine: (value) {
+                          return const FlLine(color: Colors.grey, strokeWidth: 0.4);
+                        },
+                        getDrawingVerticalLine: (value) {
+                          return const FlLine(color: Colors.grey, strokeWidth: 0.4);
+                        },
+                      ),
+                      borderData: FlBorderData(
+                          show: true,
+                          border: Border.all(color: Colors.grey, width: 0.5)),
                       lineBarsData: [
                         LineChartBarData(
                           spots: data,
                           isCurved: true,
                           color: isDark ? Colors.cyanAccent : Colors.blueAccent,
                           barWidth: 3,
+                          isStrokeCapRound: true,
+                          dotData: const FlDotData(show: false),
+                          belowBarData: BarAreaData(
+                            show: true,
+                            gradient: LinearGradient(
+                              colors: [
+                                (isDark ? Colors.cyanAccent : Colors.blueAccent).withOpacity(0.3),
+                                (isDark ? Colors.cyanAccent : Colors.blueAccent).withOpacity(0.0),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
                         )
                       ],
                     ),
