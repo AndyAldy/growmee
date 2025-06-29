@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:growmee/controllers/user_controller.dart';
-import 'package:growmee/theme/theme_provider.dart';
-import 'package:growmee/utils/user_session.dart';
-import 'package:growmee/widgets/nav_bar.dart';
+import '../../controllers/user_controller.dart';
+import '../../theme/theme_provider.dart';
+import '../../utils/user_session.dart';
+import '../../widgets/nav_bar.dart';
 import '../../screens/auth/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
