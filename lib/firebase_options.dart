@@ -41,49 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBI6oFybEM0cCOnXs-_A2jyrYMAbgkxiwI',
-    appId: '1:465933799387:web:eeacc27cf69885c2c961fe',
-    messagingSenderId: '465933799387',
-    projectId: 'growme-3e411',
-    authDomain: 'growme-3e411.firebaseapp.com',
-    storageBucket: 'growme-3e411.firebasestorage.app',
-    measurementId: 'G-5P9S7FY4KS',
+    apiKey: 'AIzaSyD9DcElfJasp-Gbyp1Cql4KZMM2cxzP-Fg',
+    appId: '1:1066353372871:web:c18ea90a8034cf13bf18e2',
+    messagingSenderId: '1066353372871',
+    projectId: 'growme-f8577',
+    authDomain: 'growme-f8577.firebaseapp.com',
+    storageBucket: 'growme-f8577.firebasestorage.app',
+    measurementId: 'G-MKKL4W0WG5',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyATJY3GBl3Ne3lZfKnCnJkFHJJnMi_iIIo',
-    appId: '1:465933799387:android:d273e8b35dd0e64ec961fe',
-    messagingSenderId: '465933799387',
-    projectId: 'growme-3e411',
-    storageBucket: 'growme-3e411.firebasestorage.app',
+    apiKey: 'AIzaSyAGeOqJQi1Iisthlg3q6n9yeo4S9tVMy4I',
+    appId: '1:1066353372871:android:4a4fcb86e6588aa2bf18e2',
+    messagingSenderId: '1066353372871',
+    projectId: 'growme-f8577',
+    storageBucket: 'growme-f8577.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAv5m-rfStp8Vc-Rd4F_YYgLG2OmO1UpdY',
-    appId: '1:465933799387:ios:eb378d63cde61fbac961fe',
-    messagingSenderId: '465933799387',
-    projectId: 'growme-3e411',
-    storageBucket: 'growme-3e411.firebasestorage.app',
+    apiKey: 'AIzaSyDOwGA10CP3JUm4JVQ0lxGHLb34BPzUWG4',
+    appId: '1:1066353372871:ios:b8750dcc35851178bf18e2',
+    messagingSenderId: '1066353372871',
+    projectId: 'growme-f8577',
+    storageBucket: 'growme-f8577.firebasestorage.app',
+    androidClientId: '1066353372871-oh44i6h0bk9l0uqlg31h9r4184t8b895.apps.googleusercontent.com',
     iosBundleId: 'com.example.growmee',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAv5m-rfStp8Vc-Rd4F_YYgLG2OmO1UpdY',
-    appId: '1:465933799387:ios:eb378d63cde61fbac961fe',
-    messagingSenderId: '465933799387',
-    projectId: 'growme-3e411',
-    storageBucket: 'growme-3e411.firebasestorage.app',
+    apiKey: 'AIzaSyDOwGA10CP3JUm4JVQ0lxGHLb34BPzUWG4',
+    appId: '1:1066353372871:ios:b8750dcc35851178bf18e2',
+    messagingSenderId: '1066353372871',
+    projectId: 'growme-f8577',
+    storageBucket: 'growme-f8577.firebasestorage.app',
+    androidClientId: '1066353372871-oh44i6h0bk9l0uqlg31h9r4184t8b895.apps.googleusercontent.com',
     iosBundleId: 'com.example.growmee',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBI6oFybEM0cCOnXs-_A2jyrYMAbgkxiwI',
-    appId: '1:465933799387:web:67a0b61f8637721cc961fe',
-    messagingSenderId: '465933799387',
-    projectId: 'growme-3e411',
-    authDomain: 'growme-3e411.firebaseapp.com',
-    storageBucket: 'growme-3e411.firebasestorage.app',
-    measurementId: 'G-NXEM7XZHCN',
+    apiKey: 'AIzaSyD9DcElfJasp-Gbyp1Cql4KZMM2cxzP-Fg',
+    appId: '1:1066353372871:web:1b2250d246b563ccbf18e2',
+    messagingSenderId: '1066353372871',
+    projectId: 'growme-f8577',
+    authDomain: 'growme-f8577.firebaseapp.com',
+    storageBucket: 'growme-f8577.firebasestorage.app',
+    measurementId: 'G-6HWW44LSJ9',
   );
 
 }

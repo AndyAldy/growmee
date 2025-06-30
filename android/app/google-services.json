@@ -1,21 +1,30 @@
 {
   "project_info": {
-    "project_number": "465933799387",
-    "project_id": "growme-3e411",
-    "storage_bucket": "growme-3e411.firebasestorage.app"
+    "project_number": "1066353372871",
+    "project_id": "growme-f8577",
+    "storage_bucket": "growme-f8577.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:465933799387:android:d273e8b35dd0e64ec961fe",
+        "mobilesdk_app_id": "1:1066353372871:android:4a4fcb86e6588aa2bf18e2",
         "android_client_info": {
-          "package_name": "com.GrowME"
+          "package_name": "com.growME"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1066353372871-oh44i6h0bk9l0uqlg31h9r4184t8b895.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.growME",
+            "certificate_hash": "b75330dbfcce251956f54c1bad6e51ee59e643af"
+          }
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyATJY3GBl3Ne3lZfKnCnJkFHJJnMi_iIIo"
+          "current_key": "AIzaSyAGeOqJQi1Iisthlg3q6n9yeo4S9tVMy4I"
         }
       ],
       "services": {
