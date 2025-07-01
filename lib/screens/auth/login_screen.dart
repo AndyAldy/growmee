@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:growmee/controllers/auth_controller.dart';
 import 'package:growmee/controllers/user_controller.dart';
 import 'package:growmee/utils/user_session.dart';
+import '../../theme/halus.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     userSession = Get.put(UserSession(), permanent: true);
     _loadLastUserAndCheckBiometrics();
   }
+
   Future<void> _loadLastUserAndCheckBiometrics() async {
     final args = Get.arguments as Map<String, dynamic>?;
     String? userIdFromArgs = args?['userId'];
@@ -59,10 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
   Future<void> _saveLastUserId(String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_user_id', userId);
   }
+
   Future<void> _checkBiometricStatus(String userId) async {
     try {
       await userController.fetchUserData(userId);
@@ -157,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-         setState(() {
+          setState(() {
           _error = 'Perangkat tidak mendukung biometrik.';
         });
         return;
@@ -196,17 +200,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildStandardLoginView() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child:const Image(
+              image: AssetImage('assets/img/Logo GrowME.png'),
+              height: 50,
+            ),
+        ),
+
+        const SizedBox(height: 80),
         const Text(
           'Welcome to GrowME',
+          textAlign: TextAlign.center, // Center the text itself
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 140),
         TextField(
           controller: _emailController,
           decoration: const InputDecoration(labelText: 'Email'),
           keyboardType: TextInputType.emailAddress,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: CustomPaint(painter: SmoothLinePainter()),
         ),
         TextField(
           controller: _passwordController,
@@ -226,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ElevatedButton(
           onPressed: _isLoading ? null : _login,
           child: _isLoading
-              ? const CircularProgressIndicator(color: Colors.white)
+              ? const CircularProgressIndicator(color: Color.fromARGB(255, 68, 255, 137))
               : const Text('Login'),
         ),
         const SizedBox(height: 8),
@@ -260,6 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ],
     );
   }
+
   Widget _buildBiometricLoginView() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -305,11 +324,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Center(
+      // Use SafeArea to avoid UI being hidden by notches or status bars
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          // REMOVED the Center widget from here
           child: _isCheckingBiometricStatus
-              ? const CircularProgressIndicator()
+              // Center only the loading indicator
+              ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                   child: _biometricOnlyLogin
                       ? _buildBiometricLoginView()

@@ -40,7 +40,7 @@ class NavBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
         BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Live Chart'),
         BottomNavigationBarItem(icon: Icon(Icons.support_agent), label: 'Tanya AI'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }

@@ -88,17 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    ListTile(
-                      leading: const Icon(Icons.person_outline),
-                      title: const Text('Nama Lengkap'),
-                      subtitle: Text(user.name ?? '-'),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.email_outlined),
-                      title: const Text('Email'),
-                      subtitle: Text(user.email),
-                    ),
                     const Divider(),
                     SwitchListTile(
                       title: const Text('Aktifkan Login dengan Fingerprint'),

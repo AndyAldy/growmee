@@ -69,10 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () => Get.to(() => const ChartScreen()),
               ),
               _QuickAction(
-                icon: Icons.pie_chart_outline,
-                label: 'Reksadana',
+                icon: Icons.support_agent,
+                label: 'Joko',
                 isDark: isDark,
-                onTap: () => Get.toNamed('/edu'),
+                onTap: () => Get.toNamed('/ai'),
               ),
               _QuickAction(
                 icon: Icons.account_circle_outlined,
