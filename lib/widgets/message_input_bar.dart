@@ -4,12 +4,14 @@ class MessageInputBar extends StatelessWidget {
   final TextEditingController controller;
   final bool isLoading;
   final VoidCallback onSend;
+  final FocusNode? focusNode;
 
   const MessageInputBar({
     super.key,
     required this.controller,
     required this.isLoading,
     required this.onSend,
+    this.focusNode,
   });
 
   @override
@@ -21,7 +23,7 @@ class MessageInputBar extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              autofocus: true,
+              focusNode: focusNode,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(15),
                 hintText: 'Ketik pesan...',

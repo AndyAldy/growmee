@@ -108,22 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final userId = authController.userId;
-      final email = _emailController.text.trim();
-
       if (userId != null) {
-        final exists = await userController.checkUserExists(userId);
-        if (!exists) {
-          await userController.saveInitialUserData(userId, email, '');
-        }
-
         await userController.fetchUserData(userId);
-        final name = userController.userModel?.name ?? '';
-        userSession.setUserId(userId);
-        userSession.setUserName(name);
-
         await _saveLastUserId(userId);
-
-        Get.offAllNamed('/home', arguments: {'userId': userId});
+        Get.offAllNamed('/post_auth_splash');
       } else {
         setState(() {
           _error = 'Login gagal: ID pengguna tidak ditemukan.';
@@ -134,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _error = 'Login gagal: Email atau Password salah.';
       });
     } finally {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
@@ -149,23 +137,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      bool canCheckBiometrics = await auth.canCheckBiometrics;
-      bool isDeviceSupported = await auth.isDeviceSupported();
-
-      if (canCheckBiometrics && isDeviceSupported) {
-        isAuthenticated = await auth.authenticate(
-          localizedReason: 'Gunakan sidik jari untuk login',
-          options: const AuthenticationOptions(
-            biometricOnly: true,
-            stickyAuth: true,
-          ),
-        );
-      } else {
-          setState(() {
-          _error = 'Perangkat tidak mendukung biometrik.';
-        });
-        return;
-      }
+      isAuthenticated = await auth.authenticate(
+        localizedReason: 'Gunakan sidik jari untuk login',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+        ),
+      );
     } catch (e) {
       setState(() {
         _error = 'Otentikasi biometrik gagal: $e';
@@ -176,13 +154,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final userId = _lastUserId;
       if (userId != null) {
         await userController.fetchUserData(userId);
-        final name = userController.userModel?.name ?? '';
-        userSession.setUserId(userId);
-        userSession.setUserName(name);
-
         await _saveLastUserId(userId);
-
-        Get.offAllNamed('/home', arguments: {'userId': userId});
+        Get.offAllNamed('/post_auth_splash');
       } else {
         setState(() {
           _error = 'ID Pengguna tidak ditemukan. Silakan login manual.';
@@ -190,13 +163,14 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } else {
-      if(mounted) {
+      if (mounted) {
         setState(() {
           _error = "Otentikasi dibatalkan.";
         });
       }
     }
   }
+
 
   Widget _buildStandardLoginView() {
     return Column(

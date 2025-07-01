@@ -44,7 +44,6 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
   bool _isLoading = false;
   String? _error;
   
-  // FIX: Re-introducing ActiveField to track the bubble's target step-by-step
   ActiveField _activeField = ActiveField.name;
   double _bubbleYPosition = 0;
 
@@ -97,7 +96,6 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     _passwordController.dispose();
     _confirmPasswordController.dispose();
 
-    // Remove all focus listeners
     _nameFocus.removeListener(_handleFocusChange);
     _emailFocus.removeListener(_handleFocusChange);
     _passwordFocus.removeListener(_handleFocusChange);
@@ -112,11 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     super.dispose();
   }
 
-  // --- LOGIC FOR GIMMICK ---
-
   void _handleFocusChange() {
-    // This function is called whenever focus changes.
-    // It ensures the bubble is correctly positioned next to the active field.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -165,7 +159,6 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
   void _onConfirmPasswordChanged() {
     if (_confirmPasswordController.text.isNotEmpty && _activeField != ActiveField.none) {
       setState(() {
-        // All fields are filled, hide the bubble for good.
         _activeField = ActiveField.none;
       });
     }
@@ -191,7 +184,6 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     );
   }
 
-  // --- REGISTRATION LOGIC ---
   Future<void> _register() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
@@ -212,10 +204,9 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       final userId = _auth.currentUser?.uid;
       if (userId != null) {
         await userController.saveInitialUserData(userId, email, name);
-        await userController.fetchUserData(userId);
         userSession.setUserId(userId);
         userSession.setUserName(name);
-        Get.offAllNamed('/home', arguments: {'userId': userId});
+        Get.offAllNamed('/post_auth_splash');
       } else {
         setState(() => _error = 'Pendaftaran gagal: user ID tidak ditemukan');
       }

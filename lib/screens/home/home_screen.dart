@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.blue,
         elevation: 0,
         title: Text(
-          'Investasi',
+          'Kalkulator Investasi',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -148,7 +148,7 @@ class InvestmentCalculator extends StatefulWidget {
 }
 
 class _InvestmentCalculatorState extends State<InvestmentCalculator> {
-  final TextEditingController _monthlyController = TextEditingController(text: '300000');
+  final TextEditingController _monthlyController = TextEditingController(text: '10000');
   int _selectedYear = 1;
   double? _result;
 
