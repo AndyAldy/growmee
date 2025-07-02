@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // <-- Tambahkan import ini
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../controllers/user_controller.dart';
 import '../../theme/theme_provider.dart';
 import '../../utils/user_session.dart';
@@ -38,11 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // 1. Sign out dari Firebase Authentication
     await FirebaseAuth.instance.signOut();
 
-    // 2. Bersihkan data sesi lokal
     session.clear();
-
-    // 3. Arahkan ke halaman login dan kirim userId terakhir
-    //    agar bisa menampilkan opsi login sidik jari.
     Get.offAllNamed('/login', arguments: {'userId': userId});
   }
 

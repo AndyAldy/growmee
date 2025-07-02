@@ -4,14 +4,14 @@ import 'package:growmee/utils/user_session.dart';
 class UserModel {
   final String uid;
   final String email;
-  final String? riskLevel;
+  final String? saldo;
   final String? name;
   final bool fingerprintEnabled;
 
   UserModel({
     required this.uid,
     required this.email,
-    this.riskLevel,
+    this.saldo,
     this.name,
     this.fingerprintEnabled = false,
   });
@@ -20,7 +20,7 @@ class UserModel {
     return UserModel(
       uid: uid,
       email: map['email'] ?? '',
-      riskLevel: map['riskLevel'],
+      saldo: map['saldo'],
       name: map['name'],
       fingerprintEnabled: map['fingerprintEnabled'] ?? false,
     );
@@ -29,7 +29,7 @@ class UserModel {
   Map<String, dynamic> toMap() {
     return {
       'email': email,
-      'riskLevel': riskLevel,
+      'saldo': saldo,
       'name': name,
       'fingerprintEnabled': fingerprintEnabled,
     };
@@ -38,14 +38,14 @@ class UserModel {
   UserModel copyWith({
     String? uid,
     String? email,
-    String? riskLevel,
+    String? saldo,
     String? name,
     bool? fingerprintEnabled,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
       email: email ?? this.email,
-      riskLevel: riskLevel ?? this.riskLevel,
+      saldo: saldo ?? this.saldo,
       name: name ?? this.name,
       fingerprintEnabled: fingerprintEnabled ?? this.fingerprintEnabled,
     );
@@ -58,7 +58,7 @@ class UserModel {
     return UserModel(
       uid: doc.id,
       email: data['email'] ?? '',
-      riskLevel: data['riskLevel'],
+      saldo: data['saldo'],
       name: data['name'],
       fingerprintEnabled: data['fingerprintEnabled'] ?? false,
     );

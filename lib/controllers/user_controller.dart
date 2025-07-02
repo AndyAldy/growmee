@@ -24,7 +24,7 @@ class UserController extends ChangeNotifier {
       await userDoc.set({
         'email': email,
         'name': name,
-        'riskLevel': null,
+        'saldo': null,
         'fingerprintEnabled': false,
       }, SetOptions(merge: true));
 
@@ -32,7 +32,7 @@ class UserController extends ChangeNotifier {
         uid: userId,
         email: email,
         name: name,
-        riskLevel: null,
+        saldo: null,
         fingerprintEnabled: false,
       );
 
@@ -42,46 +42,34 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchUserData(String userId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+// File: lib/controllers/user_controller.dart (Perbaikan)
 
-    try {
-      final doc = await _db.collection('users').doc(uid).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        _userModel = UserModel(
-          uid: uid,
-          email: data['email'] ?? '',
-          name: data['name'] ?? '',
-          riskLevel: data['riskLevel'],
-          fingerprintEnabled: data['fingerprintEnabled'] ?? false,
-        );
+Future<void> fetchUserData(String userId) async {
+  // JANGAN gunakan `_auth.currentUser` di sini.
+  // Gunakan parameter `userId` yang dikirim dari LoginScreen.
+  if (userId.isEmpty) return;
 
-        final session = Get.find<UserSession>();
-        session.setUserId(uid);
-        session.setUserName(_userModel!.name ?? '');
+  try {
+    final doc = await _db.collection('users').doc(userId).get();
+    if (doc.exists) {
+      final data = doc.data()!;
+      _userModel = UserModel(
+        uid: userId, 
+        email: data['email'] ?? '',
+        name: data['name'] ?? '',
+        saldo: data['saldo'],
+        fingerprintEnabled: data['fingerprintEnabled'] ?? false,
+      );
+      final session = Get.find<UserSession>();
+      session.setUserId(userId);
+      session.setUserName(_userModel!.name ?? '');
 
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  void updateRiskLevel(String val) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    try {
-      await _db.collection('users').doc(uid).update({'riskLevel': val});
-
-      _userModel = _userModel?.copyWith(riskLevel: val);
       notifyListeners();
-    } catch (e) {
-      print('Error updating risk level: $e');
     }
+  } catch (e) {
+    print('Error fetching user data: $e');
   }
+}
 
   Future<void> updateFingerprintStatus(String userId, bool isEnabled) async {
     try {

@@ -114,23 +114,23 @@ class DatabaseService {
   }
 
   /// Mendapatkan risk level user
-  Future<String?> getUserRiskLevel(String userId) async {
+  Future<String?> getUsersaldo(String userId) async {
     if (userId.isEmpty) return null;
     final doc = await _db.collection('users').doc(userId).get();
-    return doc.data()?['riskLevel'] as String?;
+    return doc.data()?['saldo'] as String?;
   }
 
   /// Set risk level user
-  Future<void> setUserRiskLevel(String userId, String riskLevel) async {
+  Future<void> setUsersaldo(String userId, String saldo) async {
     if (userId.isEmpty) return;
     await _db.collection('users').doc(userId).set({
-      'riskLevel': riskLevel,
+      'saldo': saldo,
     }, SetOptions(merge: true));
   }
 
   /// Risk level user saat ini
-  Future<String?> getCurrentUserRiskLevel() {
-    return getUserRiskLevel(uid);
+  Future<String?> getCurrentUsersaldo() {
+    return getUsersaldo(uid);
   }
 
   /// Ambil saldo user lain
