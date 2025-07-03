@@ -56,32 +56,59 @@ class _ChartScreenState extends State<ChartScreen> {
 
   Future<double> _fetchPrice(String type) async {
     try {
+      // GANTI URL INI dengan URL API backend Vercel Anda yang sudah Anda deploy!
+      // Contoh: 'https://nama-project-anda.vercel.app/'
+      final String yourDeployedBackendUrl = 'https://growmee-andyaldy-andyaldys-projects.vercel.app/'; // PASTIKAN UNTUK MENGGANTI INI DENGAN URL ASLI ANDA!
+
+      Map<String, String> queryParams;
       if (type == 'Reksadana') {
-        final uri = Uri.parse(
-            'https://arima-reksadana-api.vercel.app/api?rd=RD13&days=1');
-        final res = await http.get(uri).timeout(const Duration(seconds: 3));
-        final d = jsonDecode(res.body);
-        final price = (d['data'].last['close'] as num).toDouble();
+        queryParams = {
+          'types': 'money_market',
+          'sort_by': 'return_1d',
+          'sort_direction': 'desc',
+          'per_page': '1'
+        };
         controller.updateReturnRate(0.08);
-        return price;
       } else if (type == 'Saham') {
-        final res = await http
-            .get(Uri.parse('https://api.goapi.io/quotes?symbol=BBCA'))
-            .timeout(const Duration(seconds: 3));
-        final data = jsonDecode(res.body);
+        queryParams = {
+          'search': 'BBCA',
+          'types': 'equity',
+          'per_page': '1',
+        };
         controller.updateReturnRate(0.12);
-        return (data['price'] as num).toDouble();
       } else if (type == 'Obligasi') {
-        final res = await http
-            .get(Uri.parse(
-                'https://api.tradingeconomics.com/historical/country/indonesia/government-bond-yield?&c=API_KEY'))
-            .timeout(const Duration(seconds: 3));
-        final data = jsonDecode(res.body);
+        // Jika backend Anda mendukung obligasi
+        queryParams = {
+          'types': 'fixed_income', // Asumsi ada tipe 'fixed_income' yang relevan
+          'per_page': '1'
+        };
         controller.updateReturnRate(0.06);
-        return (data['price'] as num).toDouble();
+      } else {
+        return controller.latestPrice.value; // Fallback jika tipe tidak dikenal
       }
-      return controller.latestPrice.value;
-    } catch (_) {
+
+      final uri = Uri.parse(yourDeployedBackendUrl).replace(queryParameters: queryParams);
+      final res = await http.get(uri).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200) {
+        final decodedData = jsonDecode(res.body);
+        // Sesuaikan cara Anda mengakses harga berdasarkan struktur JSON yang dikembalikan oleh API backend Anda.
+        // Berdasarkan index.js Anda, respons akan memiliki kunci 'data' yang merupakan array objek.
+        if (decodedData['data'] != null && decodedData['data'] is List && decodedData['data'].isNotEmpty) {
+          final firstProduct = decodedData['data'][0];
+          // Asumsi kunci harga di data yang didekripsi dari Bibit adalah 'latest_nav' atau 'price'.
+          // Anda perlu memeriksa struktur data aktual yang dikembalikan oleh index.js Anda.
+          final price = (firstProduct['latest_nav'] ?? firstProduct['price'] ?? 0.0).toDouble();
+          return price;
+        } else {
+          throw Exception('Data harga tidak ditemukan di respons API backend.');
+        }
+      } else {
+        throw Exception('Gagal memuat data dari API backend: Status ${res.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching price from your backend API: $e');
+      // Fallback ke harga terakhir atau nilai random jika ada error pada koneksi ke backend
       return controller.latestPrice.value + Random().nextDouble() * 10 - 5;
     }
   }
