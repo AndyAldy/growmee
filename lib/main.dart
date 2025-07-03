@@ -23,13 +23,14 @@ void main() async {
 
   await GetStorage.init();
   
+  Get.put(UserSession(), permanent: true);
+  Get.put(ChartDataController(), permanent: true);
+  
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  Get.put(UserSession(), permanent: true);
-  Get.put(ChartDataController(), permanent: true);
 
   runApp(
     MultiProvider(
