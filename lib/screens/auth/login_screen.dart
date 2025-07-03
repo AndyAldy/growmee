@@ -23,6 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   late final UserSession userSession;
   final UserController userController = Get.put(UserController());
 
+  bool _passwordVisible = false;
+
   bool _isLoading = false;
   String? _error;
 
@@ -202,8 +204,30 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         TextField(
           controller: _passwordController,
-          decoration: const InputDecoration(labelText: 'Password'),
-          obscureText: true,
+          obscureText: !_passwordVisible, // Gunakan state di sini
+          decoration: InputDecoration(
+            labelText: 'Password',
+            labelStyle: const TextStyle(color: Colors.white),
+            prefixIcon: const Icon(Icons.lock, color: Colors.white70),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.white70,
+              ),
+              onPressed: () {
+                setState(() {
+                  _passwordVisible = !_passwordVisible;
+                });
+              },
+            ),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.1),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          style: const TextStyle(color: Colors.white),
         ),
         const SizedBox(height: 16),
         if (_error != null)

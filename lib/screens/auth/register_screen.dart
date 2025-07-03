@@ -13,80 +13,151 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-// Enum to track which field is currently the target
 enum ActiveField { name, email, password, confirm, none }
 
-class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProviderStateMixin {
-  // Firebase & Controllers
+class _RegisterScreenState extends State<RegisterScreen>
+    with SingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final userController = Get.put(UserController());
-  final userSession = Get.put(UserSession());
+  final UserController userController = Get.find();
+  final UserSession userSession = Get.find();
 
-  // Text Editing Controllers
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  // Focus Nodes to control text field focus
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
 
-  // Keys to get the position of each text field
   final GlobalKey _nameKey = GlobalKey();
   final GlobalKey _emailKey = GlobalKey();
   final GlobalKey _passwordKey = GlobalKey();
   final GlobalKey _confirmPasswordKey = GlobalKey();
 
-  // State for UI logic
   bool _isLoading = false;
   String? _error;
-  
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
+
   ActiveField _activeField = ActiveField.name;
   double _bubbleYPosition = 0;
 
-  // State to enable/disable text fields
   bool _isEmailEnabled = false;
   bool _isPasswordEnabled = false;
   bool _isConfirmPasswordEnabled = false;
 
-  // Animation variables
   AnimationController? _animationController;
   Animation<double>? _animation;
 
   @override
   void initState() {
     super.initState();
-    
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: -5.0, end: 5.0).animate(
-      CurvedAnimation(parent: _animationController!, curve: Curves.easeInOut),
+      duration: const Duration(milliseconds: 300),
     );
+    _animation =
+        CurvedAnimation(parent: _animationController!, curve: Curves.easeOut);
 
-    // Add listeners to controllers to advance the state
-    _nameController.addListener(_onNameChanged);
-    _emailController.addListener(_onEmailChanged);
-    _passwordController.addListener(_onPasswordChanged);
-    _confirmPasswordController.addListener(_onConfirmPasswordChanged);
+    _nameFocus.addListener(() => _handleFocusChange(ActiveField.name, _nameKey));
+    _emailFocus.addListener(() => _handleFocusChange(ActiveField.email, _emailKey));
+    _passwordFocus.addListener(() => _handleFocusChange(ActiveField.password, _passwordKey));
+    _confirmPasswordFocus.addListener(() => _handleFocusChange(ActiveField.confirm, _confirmPasswordKey));
 
-    // Add listeners to FocusNodes to update bubble position on focus change
-    _nameFocus.addListener(_handleFocusChange);
-    _emailFocus.addListener(_handleFocusChange);
-    _passwordFocus.addListener(_handleFocusChange);
-    _confirmPasswordFocus.addListener(_handleFocusChange);
+    _nameController.addListener(() => _updateFieldState(ActiveField.name));
+    _emailController.addListener(() => _updateFieldState(ActiveField.email));
+    _passwordController.addListener(() => _updateFieldState(ActiveField.password));
+    _confirmPasswordController.addListener(() => setState(() {}));
+
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _updateBubblePosition(_nameKey);
-        FocusScope.of(context).requestFocus(_nameFocus);
+      _handleFocusChange(ActiveField.name, _nameKey);
+    });
+  }
+
+  void _handleFocusChange(ActiveField field, GlobalKey key) {
+    if ((field == ActiveField.name && _nameFocus.hasFocus) ||
+        (field == ActiveField.email && _emailFocus.hasFocus) ||
+        (field == ActiveField.password && _passwordFocus.hasFocus) ||
+        (field == ActiveField.confirm && _confirmPasswordFocus.hasFocus)) {
+      if (key.currentContext != null) {
+        final RenderBox renderBox =
+            key.currentContext!.findRenderObject() as RenderBox;
+        final position = renderBox.localToGlobal(Offset.zero);
+        setState(() {
+          _activeField = field;
+          _bubbleYPosition = position.dy + (renderBox.size.height / 2);
+        });
+        _animationController!.forward(from: 0);
+      }
+    }
+  }
+
+  void _updateFieldState(ActiveField field) {
+    setState(() {
+      if (field == ActiveField.name) {
+        _isEmailEnabled = _nameController.text.isNotEmpty;
+      } else if (field == ActiveField.email) {
+        _isPasswordEnabled = GetUtils.isEmail(_emailController.text);
+      } else if (field == ActiveField.password) {
+        _isConfirmPasswordEnabled = _passwordController.text.length >= 6;
       }
     });
+  }
+
+  Future<void> _register() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _error = "Password tidak cocok!";
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (userCredential.user != null) {
+        // FIX: Pastikan menggunakan await karena ini adalah operasi Future
+        await userController.createUser(
+          userCredential.user!.uid,
+          _nameController.text.trim(),
+          _emailController.text.trim(),
+          "0",
+        );
+        // FIX: Pastikan menggunakan await
+        await userSession.startSession(userCredential.user!.uid);
+        Get.offAllNamed('/home');
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'weak-password') {
+          _error = 'Password yang diberikan terlalu lemah.';
+        } else if (e.code == 'email-already-in-use') {
+          _error = 'Akun sudah ada untuk email tersebut.';
+        } else {
+          _error = 'Terjadi kesalahan. Silakan coba lagi.';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Terjadi kesalahan. Silakan coba lagi.';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -95,169 +166,162 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-
-    _nameFocus.removeListener(_handleFocusChange);
-    _emailFocus.removeListener(_handleFocusChange);
-    _passwordFocus.removeListener(_handleFocusChange);
-    _confirmPasswordFocus.removeListener(_handleFocusChange);
-    
     _nameFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
     _confirmPasswordFocus.dispose();
-    
     _animationController?.dispose();
     super.dispose();
   }
 
-  void _handleFocusChange() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
-      if (_nameFocus.hasFocus && _activeField == ActiveField.name) {
-        _updateBubblePosition(_nameKey);
-      } else if (_emailFocus.hasFocus && _activeField == ActiveField.email) {
-        _updateBubblePosition(_emailKey);
-      } else if (_passwordFocus.hasFocus && _activeField == ActiveField.password) {
-        _updateBubblePosition(_passwordKey);
-      } else if (_confirmPasswordFocus.hasFocus && _activeField == ActiveField.confirm) {
-        _updateBubblePosition(_confirmPasswordKey);
-      }
-    });
-  }
+    final bool isRegisterButtonEnabled = _isConfirmPasswordEnabled &&
+        _confirmPasswordController.text.isNotEmpty &&
+        _passwordController.text == _confirmPasswordController.text;
 
-  void _onNameChanged() {
-    if (_nameController.text.isNotEmpty && !_isEmailEnabled) {
-      setState(() {
-        _isEmailEnabled = true;
-        _activeField = ActiveField.email;
-      });
-      _emailFocus.requestFocus();
-    }
-  }
-
-  void _onEmailChanged() {
-    if (_emailController.text.isNotEmpty && !_isPasswordEnabled) {
-      setState(() {
-        _isPasswordEnabled = true;
-        _activeField = ActiveField.password;
-      });
-      _passwordFocus.requestFocus();
-    }
-  }
-
-  void _onPasswordChanged() {
-    if (_passwordController.text.isNotEmpty && !_isConfirmPasswordEnabled) {
-      setState(() {
-        _isConfirmPasswordEnabled = true;
-        _activeField = ActiveField.confirm;
-      });
-      _confirmPasswordFocus.requestFocus();
-    }
-  }
-  
-  void _onConfirmPasswordChanged() {
-    if (_confirmPasswordController.text.isNotEmpty && _activeField != ActiveField.none) {
-      setState(() {
-        _activeField = ActiveField.none;
-      });
-    }
-  }
-
-  void _updateBubblePosition(GlobalKey key) {
-    final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      final position = renderBox.localToGlobal(Offset.zero, ancestor: context.findRenderObject());
-      setState(() {
-        _bubbleYPosition = position.dy - 40; 
-      });
-    }
-  }
-
-  void _showBlockedMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Isi dulu field sebelumnya baru boleh lanjut!'),
-        backgroundColor: Colors.orange,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  Future<void> _register() async {
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      setState(() => _error = 'Semua field harus diisi');
-      return;
-    }
-    if (password != confirmPassword) {
-      setState(() => _error = 'Password dan Password Konfirmasi tidak cocok');
-      return;
-    }
-    setState(() { _isLoading = true; _error = null; });
-    try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      final userId = _auth.currentUser?.uid;
-      if (userId != null) {
-        await userController.saveInitialUserData(userId, email, name);
-        userSession.setUserId(userId);
-        userSession.setUserName(name);
-        Get.offAllNamed('/post_auth_splash');
-      } else {
-        setState(() => _error = 'Pendaftaran gagal: user ID tidak ditemukan');
-      }
-    } on FirebaseAuthException catch (e) {
-      setState(() => _error = e.message ?? 'Terjadi kesalahan');
-    } catch (e) {
-      setState(() => _error = 'Error: Kesalahan Sistem');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  // --- WIDGET BUILDERS ---
-
-  Widget _buildTouchMeBubble() {
-    if (_animation == null) {
-      return const SizedBox.shrink();
-    }
-
-    return AnimatedBuilder(
-      animation: _animation!,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, _animation!.value),
-          child: child,
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: CustomPaint(
+        painter: SmoothLinePainter(),
+        child: Stack(
           children: [
-            Icon(Icons.touch_app, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text(
-              'Isi di sini',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image.asset('assets/GrowME.png', height: 100),
+                    const SizedBox(height: 30),
+                    if (_error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    _buildTextField(
+                        key: _nameKey,
+                        controller: _nameController,
+                        focusNode: _nameFocus,
+                        labelText: 'Nama Lengkap',
+                        icon: Icons.person,
+                        enabled: true),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                        key: _emailKey,
+                        controller: _emailController,
+                        focusNode: _emailFocus,
+                        labelText: 'Email',
+                        icon: Icons.email,
+                        keyboardType: TextInputType.emailAddress,
+                        enabled: _isEmailEnabled),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                        key: _passwordKey,
+                        controller: _passwordController,
+                        focusNode: _passwordFocus,
+                        labelText: 'Password',
+                        icon: Icons.lock,
+                        obscureText: !_passwordVisible,
+                        enabled: _isPasswordEnabled,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                        )),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                        key: _confirmPasswordKey,
+                        controller: _confirmPasswordController,
+                        focusNode: _confirmPasswordFocus,
+                        labelText: 'Konfirmasi Password',
+                        icon: Icons.lock_outline,
+                        obscureText: !_confirmPasswordVisible,
+                        enabled: _isConfirmPasswordEnabled,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _confirmPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _confirmPasswordVisible = !_confirmPasswordVisible;
+                            });
+                          },
+                        )),
+                    const SizedBox(height: 30),
+                    _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ElevatedButton(
+                            onPressed: isRegisterButtonEnabled ? _register : null,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: theme.colorScheme.secondary,
+                              disabledBackgroundColor: Colors.grey.withOpacity(0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Daftar',
+                              style: TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text(
+                        'Sudah punya akun? Login',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
+            if (_activeField != ActiveField.none)
+              AnimatedBuilder(
+                animation: _animation!,
+                builder: (context, child) {
+                  return Positioned(
+                    top: _bubbleYPosition -
+                        (15 * _animation!.value),
+                    left: 20,
+                    child: Opacity(
+                      opacity: _animation!.value,
+                      child: CustomPaint(
+                        painter: BubblePainter(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          child: Text(
+                            _getBubbleText(),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -268,126 +332,78 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
     required GlobalKey key,
     required TextEditingController controller,
     required FocusNode focusNode,
-    required String label,
-    bool isEnabled = true,
+    required String labelText,
+    required IconData icon,
     bool obscureText = false,
-    TextInputType? keyboardType,
+    TextInputType keyboardType = TextInputType.text,
+    bool enabled = true,
+    Widget? suffixIcon,
   }) {
-    return GestureDetector(
-      onTap: () {
-        if (!isEnabled) {
-          _showBlockedMessage();
-        }
-      },
-      child: AbsorbPointer(
-        absorbing: !isEnabled,
-        child: TextField(
-          key: key,
-          controller: controller,
-          focusNode: focusNode,
-          decoration: InputDecoration(
-            labelText: label,
-            border: InputBorder.none,
-            labelStyle: TextStyle(color: isEnabled ? null : Colors.grey[400]),
-          ),
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          enabled: isEnabled,
+    return TextField(
+      key: key,
+      controller: controller,
+      focusNode: focusNode,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      enabled: enabled,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+            color: enabled ? Colors.white : Colors.white.withOpacity(0.5)),
+        prefixIcon: Icon(icon,
+            color: enabled ? Colors.white70 : Colors.white.withOpacity(0.5)),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
         ),
       ),
+      style: TextStyle(
+          color: enabled ? Colors.white : Colors.white.withOpacity(0.7)),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Daftar Akun',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 48),
-                      _buildTextField(
-                        key: _nameKey,
-                        controller: _nameController,
-                        focusNode: _nameFocus,
-                        label: 'Nama Lengkap',
-                      ),
-                      SizedBox(height: 1.5, child: CustomPaint(painter: SmoothLinePainter())),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        key: _emailKey,
-                        controller: _emailController,
-                        focusNode: _emailFocus,
-                        label: 'Email',
-                        isEnabled: _isEmailEnabled,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 1.5, child: CustomPaint(painter: SmoothLinePainter())),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        key: _passwordKey,
-                        controller: _passwordController,
-                        focusNode: _passwordFocus,
-                        label: 'Password',
-                        isEnabled: _isPasswordEnabled,
-                        obscureText: true,
-                      ),
-                      SizedBox(height: 1.5, child: CustomPaint(painter: SmoothLinePainter())),
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                        key: _confirmPasswordKey,
-                        controller: _confirmPasswordController,
-                        focusNode: _confirmPasswordFocus,
-                        label: 'Konfirmasi Password',
-                        isEnabled: _isConfirmPasswordEnabled,
-                        obscureText: true,
-                      ),
-                      SizedBox(height: 1.5, child: CustomPaint(painter: SmoothLinePainter())),
-                      const SizedBox(height: 16),
-                      if (_error != null)
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _isLoading ? null : _register,
-                        child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('Daftar Akun'),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => Get.back(),
-                        child: const Text('Sudah punya akun? Masuk di sini'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // FIX: Visibility is now controlled by the ActiveField enum
-            Visibility(
-              visible: _activeField != ActiveField.none,
-              child: Positioned(
-                top: _bubbleYPosition,
-                right: 24,
-                child: _buildTouchMeBubble(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  String _getBubbleText() {
+    switch (_activeField) {
+      case ActiveField.name:
+        return 'Masukkan nama lengkapmu, ya!';
+      case ActiveField.email:
+        return 'Pastikan emailnya aktif, oke?';
+      case ActiveField.password:
+        return 'Buat password yang kuat, minimal 6 karakter.';
+      case ActiveField.confirm:
+        return 'Ulangi password di atas.';
+      default:
+        return '';
+    }
   }
+}
+
+class BubblePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue.withOpacity(0.8)
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          const Radius.circular(8)))
+      ..moveTo(size.width - 20, size.height)
+      ..relativeLineTo(5, 5)
+      ..relativeLineTo(5, -5)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

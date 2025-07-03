@@ -11,6 +11,7 @@ import 'package:growmee/controllers/chart_data_controller.dart';
 import 'package:growmee/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,11 @@ void main() async {
   );
 
   await GetStorage.init();
+  
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   Get.put(UserSession(), permanent: true);
   Get.put(ChartDataController(), permanent: true);
