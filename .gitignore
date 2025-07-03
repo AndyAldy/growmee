@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -48,4 +49,5 @@ app.*.map.json
 assets/Icon_apk/Logo GrowME.png
 .env
 .vercel
+
 
