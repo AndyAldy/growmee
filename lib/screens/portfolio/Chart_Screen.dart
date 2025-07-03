@@ -56,9 +56,7 @@ class _ChartScreenState extends State<ChartScreen> {
 
   Future<double> _fetchPrice(String type) async {
     try {
-      // GANTI URL INI dengan URL API backend Vercel Anda yang sudah Anda deploy!
-      // Contoh: 'https://nama-project-anda.vercel.app/'
-      final String yourDeployedBackendUrl = 'https://growmee-andyaldy-andyaldys-projects.vercel.app/'; // PASTIKAN UNTUK MENGGANTI INI DENGAN URL ASLI ANDA!
+      final String yourDeployedBackendUrl = 'https://growmee-andyaldy-andyaldys-projects.vercel.app/';
 
       Map<String, String> queryParams;
       if (type == 'Reksadana') {
@@ -92,12 +90,8 @@ class _ChartScreenState extends State<ChartScreen> {
 
       if (res.statusCode == 200) {
         final decodedData = jsonDecode(res.body);
-        // Sesuaikan cara Anda mengakses harga berdasarkan struktur JSON yang dikembalikan oleh API backend Anda.
-        // Berdasarkan index.js Anda, respons akan memiliki kunci 'data' yang merupakan array objek.
         if (decodedData['data'] != null && decodedData['data'] is List && decodedData['data'].isNotEmpty) {
           final firstProduct = decodedData['data'][0];
-          // Asumsi kunci harga di data yang didekripsi dari Bibit adalah 'latest_nav' atau 'price'.
-          // Anda perlu memeriksa struktur data aktual yang dikembalikan oleh index.js Anda.
           final price = (firstProduct['latest_nav'] ?? firstProduct['price'] ?? 0.0).toDouble();
           return price;
         } else {
